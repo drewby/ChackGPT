@@ -14,6 +14,8 @@ If you're looking to build production applications, please refer to official Mic
 
 ChackGPT is the digital avatar of Chack, a .NET and C# expert software engineer. It provides an engaging, real-time chat interface powered by Azure OpenAI and demonstrates cutting-edge .NET technologies including Blazor Server, SignalR streaming, Microsoft Agent Framework, and .NET Aspire orchestration.
 
+![ChackGPT Chat Interface](docs/screenshot.png)
+
 ## ✨ Key Features
 
 - **Real-Time Streaming Chat** - Token-by-token response delivery using SignalR for engaging live presentations
