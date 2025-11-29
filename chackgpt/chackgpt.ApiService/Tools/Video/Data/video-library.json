@@ -1,0 +1,40 @@
+{
+  "videos": [
+    {
+      "id": "what-will-happen-to-chack",
+      "title": "What will happen to Chack?",
+      "description": "An exciting exploration of Chack's future in the .NET ecosystem. Discover what innovations and adventures await!",
+      "videoUrl": "/videos/chackgpt-rock-video-v2.mp4"
+    },
+    {
+      "id": "dotnet10-overview",
+      "title": ".NET 10 Overview",
+      "description": "A comprehensive overview of .NET 10 features, performance improvements, and new capabilities.",
+      "videoUrl": "https://example.com/videos/dotnet10-overview.mp4"
+    },
+    {
+      "id": "csharp14-features",
+      "title": "C# 14 Language Features",
+      "description": "Deep dive into C# 14 language enhancements including field keyword, params collections, and more.",
+      "videoUrl": "https://example.com/videos/csharp14-features.mp4"
+    },
+    {
+      "id": "aspnet-core-10",
+      "title": "ASP.NET Core 10 Updates",
+      "description": "What's new in ASP.NET Core 10: Blazor improvements, minimal APIs, OpenAPI, and authentication features.",
+      "videoUrl": "https://example.com/videos/aspnet-core-10.mp4"
+    },
+    {
+      "id": "aspire-cloud-native",
+      "title": "Building Cloud-Native Apps with Aspire 9.5",
+      "description": "Learn how to build distributed cloud-native applications using .NET Aspire 9.5 and its powerful orchestration capabilities.",
+      "videoUrl": "https://example.com/videos/aspire-cloud-native.mp4"
+    },
+    {
+      "id": "post-quantum-crypto",
+      "title": "Post-Quantum Cryptography in .NET 10",
+      "description": "Understanding and implementing post-quantum cryptography algorithms (ML-KEM, ML-DSA, SLH-DSA) in .NET 10.",
+      "videoUrl": "https://example.com/videos/post-quantum-crypto.mp4"
+    }
+  ]
+}

@@ -1,0 +1,332 @@
+@page "/chat"
+@rendermode InteractiveServer
+@using Microsoft.AspNetCore.SignalR.Client
+@using Microsoft.FluentUI.AspNetCore.Components
+@using chackgpt.Web.Components.Shared
+@using chackgpt.Web.Services
+@inject NavigationManager Navigation
+@inject IChatMessageService ChatMessageService
+@implements IAsyncDisposable
+
+<PageTitle>Chat with ChackGPT</PageTitle>
+
+<h1>Chat with ChackGPT</h1>
+
+<div style="display: flex; flex-direction: column; height: calc(100vh - 200px); max-width: 1200px;">
+    @* FluentUI components provide Microsoft design language and accessibility *@
+    
+    @* Message display area *@
+    <FluentStack @ref="messageContainer"
+                 Orientation="Orientation.Vertical" 
+                 Style="flex: 1; overflow-y: auto; margin-bottom: 20px; padding: 10px; border: 1px solid var(--neutral-stroke-rest); border-radius: 8px;">
+        
+        @if (messages.Count == 0)
+        {
+            <FluentCard Style="margin: 10px;">
+                <p class="chat-message-text">Welcome! Ask me anything about .NET, C#, Blazor, or other Microsoft technologies.</p>
+            </FluentCard>
+        }
+        
+        @foreach (var message in messages)
+        {
+            @if (message.IsUser)
+            {
+                <div style="margin: 4px 10px; align-self: flex-end; background-color: #f0f0f0; max-width: 70%; width: fit-content; padding: 6px 12px; border-radius: 8px;">
+                    @* User messages - same size as Japanese text *@
+                    <div class="chat-message-text user-message-text" style="white-space: pre-wrap;">@message.Text</div>
+                </div>
+            }
+            else
+            {
+                @* Agent messages with avatar and styled boxes *@
+                <div style="@(GetAgentMessageStyle(message.AgentName))">
+                    @if (message.AgentName == "ChackGPT")
+                    {
+                        <img src="/images/chack/chack-chatbubble.png" alt="ChackGPT" style="width: 90px; height: 90px;" />
+                    }
+                    <FluentCard Style="flex: 1;">
+                        @* Assistant messages use markdown rendering *@
+                        <div class="markdown-content">
+                            <MarkdownContent Content="@message.Text" />
+                        </div>
+                        @if (message.IsStreaming)
+                        {
+                            <FluentProgressRing Style="width: 20px; height: 20px; margin-top: 8px;" />
+                        }
+                    </FluentCard>
+                    @if (message.AgentName == "DrewGPT")
+                    {
+                        <img src="/images/drew/drew-chatbubble.png" alt="DrewGPT" style="width: 90px; height: 90px;" />
+                    }
+                </div>
+            }
+        }
+    </FluentStack>
+    
+    @* Input area *@
+    <FluentStack Orientation="Orientation.Horizontal" Style="gap: 10px; align-items: stretch;">
+        <textarea @ref="messageInput"
+                  @bind="currentMessage"
+                  @bind:event="oninput"
+                  placeholder="Type your message here... 😎"
+                  class="chat-input-textarea"
+                  rows="3"
+                  disabled="@isWaiting"></textarea>
+        <button class="chat-send-button"
+                @onclick="SendMessageAsync"
+                disabled="@(string.IsNullOrWhiteSpace(currentMessage) || isWaiting)">
+            Send
+        </button>
+    </FluentStack>
+    
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <FluentMessageBar Intent="MessageIntent.Error" Style="margin-top: 10px;">
+            @errorMessage
+        </FluentMessageBar>
+    }
+</div>
+
+@inject IJSRuntime JSRuntime
+
+@code {
+    private HubConnection? hubConnection;
+    private List<ChatMessage> messages = new();
+    private string currentMessage = string.Empty;
+    private string errorMessage = string.Empty;
+    private bool isWaiting = false;
+    private ChatMessage? streamingMessage;
+    private ElementReference messageInput;
+    private FluentStack? messageContainer;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Subscribe to chat message requests from other components
+        ChatMessageService.MessageRequested += OnMessageRequested;
+        
+        // ASP.NET Core 10 SignalR for real-time chat streaming
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl(Navigation.ToAbsoluteUri("/chathub"))
+            .WithAutomaticReconnect()
+            .Build();
+
+        hubConnection.On<string>("AgentChanged", (agentName) =>
+        {
+            if (streamingMessage != null)
+            {
+                // Agent changed - if previous message has no text, remove it (agent didn't say anything)
+                if (string.IsNullOrEmpty(streamingMessage.Text) && messages.Contains(streamingMessage))
+                {
+                    messages.Remove(streamingMessage);
+                }
+                else
+                {
+                    // Complete current message if it has content
+                    streamingMessage.IsStreaming = false;
+                }
+            }
+            
+            // Create new message for the agent and add it immediately to show thinking indicator
+            streamingMessage = new ChatMessage
+            {
+                Text = string.Empty,
+                IsUser = false,
+                IsStreaming = true,
+                AgentName = agentName
+            };
+            messages.Add(streamingMessage);
+            
+            InvokeAsync(async () =>
+            {
+                StateHasChanged();
+                await ScrollToBottomAsync();
+            });
+        });
+
+        hubConnection.On<string>("ReceiveMessageToken", (token) =>
+        {
+            if (streamingMessage != null)
+            {
+                streamingMessage.Text += token;
+                // Notify the ChatMessageService so ChackAvatar can show notification if popup is visible
+                ChatMessageService.NotifyChatMessage(token);
+                InvokeAsync(async () =>
+                {
+                    StateHasChanged();
+                    await ScrollToBottomAsync();
+                });
+            }
+        });
+
+        hubConnection.On("ReceiveMessageComplete", () =>
+        {
+            if (streamingMessage != null)
+            {
+                // If message has no text, remove it (agent didn't say anything)
+                if (string.IsNullOrEmpty(streamingMessage.Text) && messages.Contains(streamingMessage))
+                {
+                    messages.Remove(streamingMessage);
+                }
+                else
+                {
+                    streamingMessage.IsStreaming = false;
+                }
+                streamingMessage = null;
+            }
+            isWaiting = false;
+            ChatMessageService.UpdateStreamingState(false);
+            InvokeAsync(async () =>
+            {
+                StateHasChanged();
+                await ScrollToBottomAsync();
+            });
+        });
+
+        hubConnection.On<string>("ReceiveError", (error) =>
+        {
+            errorMessage = error;
+            isWaiting = false;
+            ChatMessageService.UpdateStreamingState(false);
+            if (streamingMessage != null)
+            {
+                // Only remove if the message was added to the list
+                if (messages.Contains(streamingMessage))
+                {
+                    messages.Remove(streamingMessage);
+                }
+                streamingMessage = null;
+            }
+            InvokeAsync(StateHasChanged);
+        });
+
+        try
+        {
+            await hubConnection.StartAsync();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Failed to connect to chat service: {ex.Message}";
+        }
+    }
+
+    private async void OnMessageRequested(object? sender, string message)
+    {
+        // Handle message requests from other components (e.g., SlidePopup)
+        await InvokeAsync(async () =>
+        {
+            currentMessage = message;
+            await SendMessageAsync();
+        });
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JSRuntime.InvokeVoidAsync("setupChatInput", messageInput, DotNetObjectReference.Create(this));
+        }
+    }
+
+    [JSInvokable]
+    public async Task SendFromJS(string message)
+    {
+        // Update the bound value with the current textarea content
+        currentMessage = message;
+        
+        // Clear the textarea immediately for instant feedback
+        await JSRuntime.InvokeVoidAsync("eval", "document.querySelector('textarea').value = ''");
+        
+        await SendMessageAsync();
+    }
+
+    private async Task SendMessageAsync()
+    {
+        if (string.IsNullOrWhiteSpace(currentMessage) || hubConnection is null || isWaiting)
+            return;
+
+        errorMessage = string.Empty;
+        var userMessage = currentMessage.Trim();
+        currentMessage = string.Empty;
+
+        // Set waiting state immediately for visual feedback
+        isWaiting = true;
+        ChatMessageService.UpdateStreamingState(true);
+        StateHasChanged();
+
+        // Add user message
+        messages.Add(new ChatMessage
+        {
+            Text = userMessage,
+            IsUser = true
+        });
+
+        // Don't create streaming message here - wait for AgentChanged event
+        // to know which agent will respond first
+        streamingMessage = null;
+
+        // Force UI update immediately
+        StateHasChanged();
+        await ScrollToBottomAsync();
+
+        try
+        {
+            // Send message to hub - response will stream via SignalR
+            await hubConnection.SendAsync("SendMessage", userMessage);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error sending message: {ex.Message}";
+            if (streamingMessage != null && messages.Contains(streamingMessage))
+            {
+                messages.Remove(streamingMessage);
+            }
+            streamingMessage = null;
+            isWaiting = false;
+            ChatMessageService.UpdateStreamingState(false);
+        }
+    }
+
+    private async Task ScrollToBottomAsync()
+    {
+        if (messageContainer?.Element is not null)
+        {
+            try
+            {
+                await JSRuntime.InvokeVoidAsync("scrollToBottom");
+            }
+            catch
+            {
+                // Ignore errors if element not yet rendered
+            }
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        // Unsubscribe from chat message service
+        ChatMessageService.MessageRequested -= OnMessageRequested;
+        
+        if (hubConnection is not null)
+        {
+            await hubConnection.DisposeAsync();
+        }
+    }
+
+    private string GetAgentMessageStyle(string agentName)
+    {
+        return agentName switch
+        {
+            "ChackGPT" => "margin: 4px 10px; align-self: flex-start; max-width: 85%; display: flex; align-items: flex-start;",
+            "DrewGPT" => "margin: 4px 10px; align-self: flex-start; max-width: 85%; display: flex; align-items: flex-start; flex-direction: row-reverse;",
+            _ => "margin: 4px 10px; align-self: flex-start; max-width: 85%; display: flex; align-items: flex-start;"
+        };
+    }
+
+    private class ChatMessage
+    {
+        public string Text { get; set; } = string.Empty;
+        public bool IsUser { get; set; }
+        public bool IsStreaming { get; set; }
+        public string AgentName { get; set; } = "ChackGPT"; // Default to ChackGPT
+    }
+}

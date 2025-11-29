@@ -1,0 +1,1034 @@
+@rendermode InteractiveServer
+@using Microsoft.AspNetCore.SignalR.Client
+@using chackgpt.Web.Models
+@using chackgpt.Web.Components.Shared
+@using chackgpt.Web.Services
+@using Microsoft.FluentUI.AspNetCore.Components
+@using System.Text.Json
+@inject NavigationManager Navigation
+@inject IChatMessageService ChatMessageService
+@implements IAsyncDisposable
+
+@if (isVisible && currentSlide != null)
+{
+    <div class="slide-popup-overlay" @onclick="CloseSlide">
+        <div class="slide-popup-content slide-layout-@(currentSlide.Layout ?? "text-only")" @onclick:stopPropagation="true">
+            @if (currentSlide.Layout == "hero-with-image")
+            {
+                <button class="slide-popup-close-hero" @onclick="CloseSlide" aria-label="Close slide">×</button>
+                <div class="slide-hero-layout">
+                    <div class="slide-hero-content">
+                        @if (!string.IsNullOrEmpty(currentSlide.Badge))
+                        {
+                            <div class="slide-badge">@currentSlide.Badge</div>
+                        }
+                        <h1 class="slide-hero-title">@currentSlide.Title</h1>
+                        @if (!string.IsNullOrEmpty(currentSlide.Url))
+                        {
+                            <div class="slide-hero-url">@currentSlide.Url</div>
+                        }
+                        @if (!string.IsNullOrEmpty(currentSlide.Description))
+                        {
+                            <p class="slide-hero-description">@currentSlide.Description</p>
+                        }
+                        @if (currentSlide.Bullets != null && currentSlide.Bullets.Any())
+                        {
+                            <ul class="slide-hero-bullets">
+                                @foreach (var bullet in currentSlide.Bullets)
+                                {
+                                    <li><MarkdownContent Content="@bullet" /></li>
+                                }
+                            </ul>
+                        }
+                    </div>
+                    <div class="slide-hero-image">
+                        @if (!string.IsNullOrEmpty(currentSlide.ImagePath))
+                        {
+                            <div class="slide-image-container">
+                                <img src="@GetImageUrl(currentSlide.ImagePath)" alt="@(currentSlide.ImageAlt ?? currentSlide.Title)" />
+                            </div>
+                        }
+                    </div>
+                </div>
+                @if (HasMoreSlides())
+                {
+                    <div class="slide-hero-footer">
+                        <button class="slide-next-button" @onclick="RequestNextSlide" aria-label="Next slide">›</button>
+                    </div>
+                }
+            }
+            else if (currentSlide.Layout == "title-only")
+            {
+                <button class="slide-popup-close-minimal" @onclick="CloseSlide" aria-label="Close slide">×</button>
+                <div class="slide-title-only-layout">
+                    @if (!string.IsNullOrEmpty(currentSlide.Badge))
+                    {
+                        <div class="slide-badge">@currentSlide.Badge</div>
+                    }
+                    <h1 class="slide-title-only">@currentSlide.Title</h1>
+                    @if (!string.IsNullOrEmpty(currentSlide.ImagePath))
+                    {
+                        <img src="@GetImageUrl(currentSlide.ImagePath)" alt="@(currentSlide.ImageAlt ?? currentSlide.Title)" class="slide-decorative-image" />
+                    }
+                </div>
+                @if (HasMoreSlides())
+                {
+                    <div class="slide-minimal-footer">
+                        <button class="slide-next-button" @onclick="RequestNextSlide" aria-label="Next slide">›</button>
+                    </div>
+                }
+            }
+            else if (currentSlide.Layout == "title-and-image")
+            {
+                <button class="slide-popup-close-minimal" @onclick="CloseSlide" aria-label="Close slide">×</button>
+                <div class="slide-title-image-layout">
+                    <h1 class="slide-title-image-title">@currentSlide.Title</h1>
+                    @if (!string.IsNullOrEmpty(currentSlide.ImagePath))
+                    {
+                        <div class="slide-title-image-container">
+                            <img src="@GetImageUrl(currentSlide.ImagePath)" alt="@(currentSlide.ImageAlt ?? currentSlide.Title)" />
+                        </div>
+                    }
+                </div>
+                @if (HasMoreSlides())
+                {
+                    <div class="slide-minimal-footer">
+                        <button class="slide-next-button" @onclick="RequestNextSlide" aria-label="Next slide">›</button>
+                    </div>
+                }
+            }
+            else if (currentSlide.Layout == "grid-sections")
+            {
+                <button class="slide-popup-close-hero" @onclick="CloseSlide" aria-label="Close slide">×</button>
+                <div class="slide-grid-sections-layout">
+                    <div class="slide-grid-header">
+                        <h1 class="slide-grid-title">@currentSlide.Title</h1>
+                        @if (!string.IsNullOrEmpty(currentSlide.Description))
+                        {
+                            <p class="slide-grid-subtitle">@currentSlide.Description</p>
+                        }
+                    </div>
+                    @if (currentSlide.Sections != null && currentSlide.Sections.Any())
+                    {
+                        <div class="slide-grid-container">
+                            @foreach (var gridSection in currentSlide.Sections)
+                            {
+                                <div class="slide-grid-section">
+                                    <div class="slide-grid-section-icon">@GetIconEmoji(gridSection.Icon)</div>
+                                    <h3 class="slide-grid-section-title">@gridSection.Title</h3>
+                                    <p class="slide-grid-section-content">@gridSection.Content</p>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+                @if (HasMoreSlides())
+                {
+                    <div class="slide-hero-footer">
+                        <button class="slide-next-button" @onclick="RequestNextSlide" aria-label="Next slide">›</button>
+                    </div>
+                }
+            }
+            else if (currentSlide.Layout == "left-content-right-image")
+            {
+                <button class="slide-popup-close-hero" @onclick="CloseSlide" aria-label="Close slide">×</button>
+                <div class="slide-left-right-layout">
+                    <div class="slide-left-content">
+                        <h1 class="slide-left-title">@currentSlide.Title</h1>
+                        @if (!string.IsNullOrEmpty(currentSlide.Description))
+                        {
+                            <p class="slide-left-subtitle">@currentSlide.Description</p>
+                        }
+                        @if (currentSlide.Sections != null && currentSlide.Sections.Any())
+                        {
+                            <div class="slide-left-sections">
+                                @foreach (var leftSection in currentSlide.Sections)
+                                {
+                                    <div class="slide-left-section">
+                                        <div class="slide-left-section-icon">@GetIconEmoji(leftSection.Icon)</div>
+                                        <div class="slide-left-section-content">
+                                            <h3 class="slide-left-section-title">@leftSection.Title</h3>
+                                            <p class="slide-left-section-text"><MarkdownContent Content="@leftSection.Content" /></p>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+                    <div class="slide-right-image">
+                        @if (!string.IsNullOrEmpty(currentSlide.ImagePath))
+                        {
+                            <div class="slide-image-container">
+                                <img src="@GetImageUrl(currentSlide.ImagePath)" alt="@(currentSlide.ImageAlt ?? currentSlide.Title)" />
+                            </div>
+                        }
+                    </div>
+                </div>
+                @if (HasMoreSlides())
+                {
+                    <div class="slide-hero-footer">
+                        <button class="slide-next-button" @onclick="RequestNextSlide" aria-label="Next slide">›</button>
+                    </div>
+                }
+            }
+            else
+            {
+                <button class="slide-popup-close-hero" @onclick="CloseSlide" aria-label="Close slide">×</button>
+                <div class="slide-text-only-layout">
+                    <div class="slide-hero-content">
+                        @if (!string.IsNullOrEmpty(currentSlide.Badge))
+                        {
+                            <div class="slide-badge">@currentSlide.Badge</div>
+                        }
+                        <h1 class="slide-hero-title">@currentSlide.Title</h1>
+                        @if (!string.IsNullOrEmpty(currentSlide.Url))
+                        {
+                            <div class="slide-hero-url">@currentSlide.Url</div>
+                        }
+                        @if (!string.IsNullOrEmpty(currentSlide.Description))
+                        {
+                            <p class="slide-hero-description">@currentSlide.Description</p>
+                        }
+                        @if (currentSlide.Bullets != null && currentSlide.Bullets.Any())
+                        {
+                            <ul class="slide-hero-bullets">
+                                @foreach (var bullet in currentSlide.Bullets)
+                                {
+                                    <li><MarkdownContent Content="@bullet" /></li>
+                                }
+                            </ul>
+                        }
+                        @if (!string.IsNullOrEmpty(currentSlide.Content))
+                        {
+                            <div class="slide-markdown-content">
+                                <MarkdownContent Content="@currentSlide.Content" />
+                            </div>
+                        }
+                    </div>
+                </div>
+                @if (HasMoreSlides())
+                {
+                    <div class="slide-hero-footer">
+                        <button class="slide-next-button" @onclick="RequestNextSlide" aria-label="Next slide">›</button>
+                    </div>
+                }
+            }
+        </div>
+        @if (isStreaming)
+        {
+            <div class="slide-streaming-overlay" aria-live="polite">
+                <FluentProgressRing Style="width: 180px; height: 180px;" />
+            </div>
+        }
+    </div>
+}
+
+<style>
+    .slide-popup-overlay {
+        position: fixed;
+        top: 0;
+        left: 250px;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.95);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        animation: fadeIn 0.2s ease-in;
+        padding: 0;
+    }
+
+    .slide-popup-content {
+        border-radius: 0;
+        box-shadow: none;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        animation: slideIn 0.3s ease-out;
+        position: relative;
+    }
+
+    .slide-streaming-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(0, 0, 0, 0.45);
+        z-index: 1000;
+        pointer-events: none;
+        animation: fadeIn 0.2s ease-in;
+    }
+
+    /* Hero Layout with Image */
+    .slide-layout-hero-with-image {
+        background: linear-gradient(135deg, #2B2D42 0%, #1a1b2e 100%);
+        color: white;
+    }
+
+    .slide-hero-layout {
+        display: grid;
+        grid-template-columns: 45% 55%;
+        height: 100%;
+        gap: 0;
+    }
+
+    .slide-hero-content {
+        padding: 80px 60px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .slide-badge {
+        display: inline-block;
+        background: linear-gradient(135deg, #a29bfe 0%, #dfe6e9 100%);
+        color: #2B2D42;
+        padding: 12px 32px;
+        border-radius: 24px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        margin-bottom: 40px;
+        width: fit-content;
+    }
+
+    .slide-hero-title {
+        font-size: 4rem;
+        font-weight: 700;
+        line-height: 1.1;
+        margin: 0 0 24px 0;
+        color: white;
+    }
+
+    .slide-hero-url {
+        color: #4D9FFF;
+        font-size: 1.5rem;
+        margin-bottom: 32px;
+        font-weight: 500;
+    }
+
+    .slide-hero-description {
+        font-size: 1.3rem;
+        line-height: 1.6;
+        color: #b0b0b0;
+        margin-bottom: 32px;
+    }
+
+    .slide-hero-bullets {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .slide-hero-bullets li {
+        font-size: 1.5rem;
+        line-height: 1.2;
+        color: #d0d0d0;
+        margin-bottom: 20px;
+        padding-left: 0;
+        position: relative;
+    }
+
+    .slide-hero-bullets li::before {
+        content: "";
+        display: none;
+    }
+
+    .slide-hero-bullets li p {
+        margin: 0;
+        font-size: inherit;
+        line-height: inherit;
+        color: inherit;
+    }
+
+    .slide-hero-bullets li code {
+        background: rgba(77, 159, 255, 0.2);
+        color: #4D9FFF;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+        font-size: 0.95em;
+    }
+
+    .slide-hero-image {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px;
+        background: radial-gradient(ellipse at center, rgba(77, 159, 255, 0.15) 0%, transparent 70%);
+    }
+
+    .slide-image-container {
+        background: linear-gradient(135deg, rgba(77, 159, 255, 0.3) 0%, rgba(162, 155, 254, 0.3) 100%);
+        border-radius: 32px;
+        padding: 4px;
+        box-shadow: 0 20px 60px rgba(77, 159, 255, 0.3);
+        width: 100%;
+        height: 80%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .slide-image-container img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+        border-radius: 28px;
+    }
+
+    .slide-popup-close-hero {
+        position: absolute;
+        top: 32px;
+        right: 32px;
+        background: rgba(255, 255, 255, 0.1);
+        border: none;
+        font-size: 2.5rem;
+        line-height: 1;
+        cursor: pointer;
+        color: white;
+        opacity: 0.7;
+        transition: all 0.2s;
+        padding: 8px;
+        width: 56px;
+        height: 56px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        z-index: 100;
+    }
+
+    .slide-popup-close-hero:hover {
+        opacity: 1;
+        background: rgba(255, 255, 255, 0.2);
+        transform: scale(1.05);
+    }
+
+    .slide-hero-footer {
+        position: absolute;
+        bottom: 40px;
+        right: 60px;
+    }
+
+    /* Title-Only Layout (Demo style) */
+    .slide-layout-title-only {
+        background: linear-gradient(135deg, #2B2D42 0%, #1a1b2e 100%);
+        color: white;
+    }
+
+    .slide-title-only-layout {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: flex-start;
+        padding: 80px 120px;
+        position: relative;
+    }
+
+    .slide-title-only {
+        font-size: 6rem;
+        font-weight: 700;
+        line-height: 1.1;
+        margin: 0;
+        color: white;
+    }
+
+    .slide-decorative-image {
+        position: absolute;
+        bottom: 80px;
+        right: 120px;
+        max-width: 300px;
+        max-height: 300px;
+        object-fit: contain;
+        opacity: 0.9;
+    }
+
+    .slide-popup-close-minimal {
+        position: absolute;
+        top: 32px;
+        right: 32px;
+        background: rgba(255, 255, 255, 0.1);
+        border: none;
+        font-size: 2.5rem;
+        line-height: 1;
+        cursor: pointer;
+        color: white;
+        opacity: 0.7;
+        transition: all 0.2s;
+        padding: 8px;
+        width: 56px;
+        height: 56px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        z-index: 100;
+    }
+
+    .slide-popup-close-minimal:hover {
+        opacity: 1;
+        background: rgba(255, 255, 255, 0.2);
+        transform: scale(1.05);
+    }
+
+    .slide-minimal-footer {
+        position: absolute;
+        bottom: 40px;
+        right: 60px;
+    }
+
+    /* Title and Image Layout */
+    .slide-layout-title-and-image {
+        background: linear-gradient(135deg, #2B2D42 0%, #1a1b2e 100%);
+        color: white;
+    }
+
+    .slide-title-image-layout {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 80px 120px;
+        gap: 60px;
+    }
+
+    .slide-title-image-title {
+        font-size: 5rem;
+        font-weight: 700;
+        line-height: 1.1;
+        margin: 0;
+        color: white;
+        text-align: center;
+    }
+
+    .slide-title-image-container {
+        flex: 1;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        max-height: 65%;
+    }
+
+    .slide-title-image-container img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+        border-radius: 16px;
+    }
+
+    /* Text-Only Layout (Same base style as hero, no image area) */
+    .slide-layout-text-only {
+        background: linear-gradient(135deg, #2B2D42 0%, #1a1b2e 100%);
+        color: white;
+    }
+
+    .slide-text-only-layout {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        height: 100%;
+        padding: 0 120px;
+    }
+
+    .slide-text-only-layout .slide-hero-content {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .slide-markdown-content {
+        margin-top: 32px;
+    }
+
+    .slide-markdown-content :deep(p) {
+        font-size: 1.1rem;
+        line-height: 1.8;
+        color: #d0d0d0;
+        margin-bottom: 20px;
+    }
+
+    .slide-popup-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 48px 56px 32px 56px;
+        border-bottom: 2px solid var(--neutral-stroke-rest, #ddd);
+        background: linear-gradient(to bottom, var(--neutral-layer-1, white), var(--neutral-layer-2, #fafafa));
+    }
+
+    .slide-popup-header h2 {
+        margin: 0;
+        font-size: 3.5rem;
+        font-weight: 700;
+        color: var(--accent-fill-rest, #0078d4);
+        letter-spacing: -0.02em;
+    }
+
+    .slide-popup-close {
+        background: none;
+        border: none;
+        font-size: 3rem;
+        line-height: 1;
+        cursor: pointer;
+        color: var(--neutral-foreground-rest);
+        opacity: 0.5;
+        transition: all 0.2s;
+        padding: 0;
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+    }
+
+    .slide-popup-close:hover {
+        opacity: 1;
+        background-color: var(--neutral-fill-hover, #f0f0f0);
+        transform: scale(1.1);
+    }
+
+    .slide-popup-body {
+        padding: 64px 80px;
+        overflow-y: auto;
+        flex: 1;
+        font-size: 2rem;
+    }
+
+    .slide-popup-body :deep(h1),
+    .slide-popup-body :deep(h2),
+    .slide-popup-body :deep(h3) {
+        font-size: 3rem;
+        margin-top: 0;
+        margin-bottom: 2rem;
+        font-weight: 600;
+        color: var(--neutral-foreground-rest);
+    }
+
+    .slide-popup-body :deep(p) {
+        line-height: 2;
+        font-size: 2.2rem;
+        margin-bottom: 2rem;
+        color: var(--neutral-foreground-rest);
+    }
+
+    .slide-popup-body :deep(ul),
+    .slide-popup-body :deep(ol) {
+        font-size: 2.2rem;
+        line-height: 2.2;
+        padding-left: 3rem;
+    }
+
+    .slide-popup-body :deep(li) {
+        margin-bottom: 1.8rem;
+        color: var(--neutral-foreground-rest);
+    }
+
+    .slide-popup-body :deep(strong),
+    .slide-popup-body :deep(b) {
+        font-weight: 700;
+        color: var(--accent-fill-rest, #0078d4);
+    }
+
+    .slide-popup-body :deep(code) {
+        background-color: var(--neutral-fill-rest, #f5f5f5);
+        padding: 0.2em 0.6em;
+        border-radius: 4px;
+        font-size: 2rem;
+        font-family: 'Consolas', 'Monaco', monospace;
+    }
+
+    .slide-popup-footer {
+        padding: 24px 32px;
+        display: flex;
+        justify-content: flex-end;
+        border-top: 2px solid var(--neutral-stroke-rest, #ddd);
+        background: linear-gradient(to top, var(--neutral-layer-1, white), var(--neutral-layer-2, #fafafa));
+    }
+
+    .slide-next-button {
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        font-size: 3rem;
+        line-height: 1;
+        cursor: pointer;
+        padding: 16px 24px;
+        font-weight: normal;
+        transition: all 0.2s;
+        border-radius: 12px;
+    }
+
+    .slide-next-button:hover {
+        background: rgba(255, 255, 255, 0.2);
+        border-color: rgba(255, 255, 255, 0.5);
+        transform: translateX(4px);
+    }
+
+    .slide-next-button:active {
+        transform: translateX(2px);
+    }
+
+    /* Grid Sections Layout */
+    .slide-layout-grid-sections {
+        background: linear-gradient(135deg, #2B2D42 0%, #1a1b2e 100%);
+        color: white;
+    }
+
+    .slide-grid-sections-layout {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        padding: 60px 80px;
+        overflow-y: auto;
+    }
+
+    .slide-grid-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    .slide-grid-title {
+        font-size: 3.5rem;
+        font-weight: 700;
+        margin: 0 0 12px 0;
+        color: white;
+    }
+
+    .slide-grid-subtitle {
+        font-size: 1.5rem;
+        color: #b0b0b0;
+        margin: 0;
+    }
+
+    .slide-grid-container {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 30px;
+        flex: 1;
+    }
+
+    .slide-grid-section {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 16px;
+        padding: 24px 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        transition: all 0.3s;
+    }
+
+    .slide-grid-section:hover {
+        background: rgba(255, 255, 255, 0.08);
+        transform: translateY(-4px);
+    }
+
+    .slide-grid-section-icon {
+        font-size: 2.5rem;
+        margin-bottom: 12px;
+        color: #a29bfe;
+    }
+
+    .slide-grid-section-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: white;
+        margin: 0 0 10px 0;
+    }
+
+    .slide-grid-section-content {
+        font-size: 1.2rem;
+        line-height: 1.5;
+        color: #c0c0c0;
+        margin: 0;
+    }
+
+    /* Left Content Right Image Layout */
+    .slide-left-right-layout {
+        height: 100%;
+        display: grid;
+        grid-template-columns: 45% 55%;
+        background: linear-gradient(135deg, #2B2D42 0%, #1a1b2e 100%);
+        color: white;
+    }
+
+    .slide-left-content {
+        padding: 80px 60px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .slide-left-title {
+        font-size: 4rem;
+        font-weight: 700;
+        margin: 0 0 16px 0;
+        color: white;
+    }
+
+    .slide-left-subtitle {
+        font-size: 1.8rem;
+        color: #a0a0a0;
+        margin: 0 0 50px 0;
+    }
+
+    .slide-left-sections {
+        display: flex;
+        flex-direction: column;
+        gap: 35px;
+    }
+
+    .slide-left-section {
+        display: flex;
+        gap: 20px;
+        align-items: flex-start;
+    }
+
+    .slide-left-section-icon {
+        font-size: 2.5rem;
+        color: #fd79a8;
+        flex-shrink: 0;
+    }
+
+    .slide-left-section-content {
+        flex: 1;
+    }
+
+    .slide-left-section-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: white;
+        margin: 0 0 8px 0;
+    }
+
+    .slide-left-section-text {
+        font-size: 1rem;
+        line-height: 1.6;
+        color: #d0d0d0;
+        margin: 0;
+    }
+
+    .slide-left-section-text p {
+        margin: 0;
+        font-size: inherit;
+        line-height: inherit;
+        color: inherit;
+    }
+
+    .slide-left-section-text strong {
+        color: white;
+        font-weight: 600;
+    }
+
+    .slide-right-image {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 60px;
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+
+    @@keyframes slideIn {
+        from {
+            transform: translateY(-30px);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+</style>
+
+@inject ILogger<SlidePopup> Logger
+@inject IConfiguration Configuration
+@inject IJSRuntime JSRuntime
+@inject IChatMessageService ChatMessageService
+
+@code {
+    private HubConnection? hubConnection;
+    private bool isVisible = false;
+    private SlideDisplayInfo? currentSlide = null;
+    private DotNetObjectReference<SlidePopup>? objRef;
+    private bool isStreaming;
+
+    private string GetImageUrl(string? imagePath)
+    {
+        if (string.IsNullOrEmpty(imagePath))
+            return string.Empty;
+
+        // If it's already an absolute URL, return as-is
+        if (imagePath.StartsWith("http://") || imagePath.StartsWith("https://"))
+            return imagePath;
+
+        // Get the API service URL from configuration
+        var apiUrl = Configuration["services:apiservice:https:0"] 
+                     ?? Configuration["services:apiservice:http:0"]
+                     ?? "https://localhost:7004";
+
+        // Remove trailing slash from API URL and leading slash from image path if present
+        apiUrl = apiUrl.TrimEnd('/');
+        imagePath = imagePath.StartsWith('/') ? imagePath : $"/{imagePath}";
+
+        return $"{apiUrl}{imagePath}";
+    }
+
+    private string GetIconEmoji(string icon)
+    {
+        return icon.ToLower() switch
+        {
+            "rocket" => "🚀",
+            "sdk" => "🔧",
+            "library" => "📚",
+            "security" => "🛡️",
+            "web" => "🌐",
+            "blazor" => "⚡",
+            "mobile" => "📱",
+            "database" => "💾",
+            "code" => "</>",
+            "integrations" => "🔗",
+            "dashboard" => "📊",
+            _ => "📦"
+        };
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Logger.LogInformation("📊 SlidePopup initializing...");
+        
+        objRef = DotNetObjectReference.Create(this);
+        ChatMessageService.StreamingStateChanged += OnStreamingStateChanged;
+        isStreaming = ChatMessageService.IsStreaming;
+        
+        // Connect to SignalR hub to receive slide display events
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl(Navigation.ToAbsoluteUri("/chathub"))
+            .WithAutomaticReconnect()
+            .Build();
+
+        // Listen for slide display requests
+        hubConnection.On<string>("SlideDisplayRequested", (slideJson) =>
+        {
+            Logger.LogInformation("📊 SlidePopup received SlideDisplayRequested");
+            try
+            {
+                currentSlide = JsonSerializer.Deserialize<SlideDisplayInfo>(slideJson);
+                if (currentSlide != null)
+                {
+                    // Briefly set to false then true to trigger notification balloon reset
+                    // This ensures the balloon clears when switching between slides
+                    ChatMessageService.IsPopupVisible = false;
+                    isVisible = true;
+                    ChatMessageService.IsPopupVisible = true;
+                    Logger.LogInformation("📊 SlidePopup displaying: {Topic} - Slide {SlideNumber}", 
+                        currentSlide.Topic, currentSlide.SlideNumber);
+                    InvokeAsync(StateHasChanged);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "❌ Failed to deserialize slide info");
+            }
+        });
+
+        // Listen for slide close requests
+        hubConnection.On("SlideCloseRequested", () =>
+        {
+            Logger.LogInformation("📊 SlidePopup received SlideCloseRequested");
+            isVisible = false;
+            currentSlide = null;
+            ChatMessageService.IsPopupVisible = false;
+            InvokeAsync(StateHasChanged);
+        });
+
+        try
+        {
+            await hubConnection.StartAsync();
+            Logger.LogInformation("✅ SlidePopup SignalR connection established");
+        }
+        catch (Exception ex)
+        {
+            Logger.LogWarning(ex, "⚠️ SlidePopup failed to connect to SignalR hub");
+        }
+    }
+    
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && objRef != null)
+        {
+            await JSRuntime.InvokeVoidAsync("setupSlidePopupKeyHandler", objRef);
+        }
+    }
+    
+    [JSInvokable]
+    public void HandleEscapeKey()
+    {
+        if (isVisible)
+        {
+            CloseSlide();
+            StateHasChanged();
+        }
+    }
+
+    private void CloseSlide()
+    {
+        Logger.LogInformation("📊 SlidePopup closing slide");
+        isVisible = false;
+        currentSlide = null;
+        ChatMessageService.IsPopupVisible = false;
+    }
+
+    private void OnStreamingStateChanged(object? sender, bool streaming)
+    {
+        isStreaming = streaming;
+        if (isVisible)
+        {
+            InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private bool HasMoreSlides()
+    {
+        if (currentSlide == null) return false;
+        if (!currentSlide.TotalSlides.HasValue) return false;
+        return currentSlide.SlideNumber < currentSlide.TotalSlides.Value;
+    }
+
+    private void RequestNextSlide()
+    {
+        Logger.LogInformation("📊 SlidePopup requesting next slide");
+        
+        // Request next slide via the ChatMessageService
+        ChatMessageService.RequestNextSlide();
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        objRef?.Dispose();
+        ChatMessageService.StreamingStateChanged -= OnStreamingStateChanged;
+        
+        if (hubConnection is not null)
+        {
+            Logger.LogInformation("📊 SlidePopup disposing SignalR connection");
+            await hubConnection.DisposeAsync();
+        }
+    }
+}

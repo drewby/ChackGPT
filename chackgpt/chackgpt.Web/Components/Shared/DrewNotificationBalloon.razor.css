@@ -1,0 +1,142 @@
+.drew-notification-balloon {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    background: white;
+    color: #2B2D42;
+    padding: 20px 24px;
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+    max-width: 600px;
+    z-index: 99999;
+    cursor: pointer;
+    animation: slideInFromRight 0.3s ease-out;
+    border: 2px solid #764ba2;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.drew-notification-avatar {
+    width: 60px;
+    height: 60px;
+    flex-shrink: 0;
+}
+
+.drew-notification-content {
+    font-size: 1rem; /* Base size for English */
+    line-height: 1.6;
+    word-wrap: break-word;
+    flex: 1;
+}
+
+/* Markdown styling for notification balloon */
+.drew-notification-content ::deep p {
+    margin: 0.5em 0;
+    font-size: 1rem !important; /* English line - smaller (default) */
+    line-height: 1.6;
+}
+
+/* First paragraph (English) - smaller */
+.drew-notification-content ::deep p:nth-of-type(1),
+.drew-notification-content ::deep p:nth-of-type(3),
+.drew-notification-content ::deep p:nth-of-type(5) {
+    font-size: 1rem !important; /* English lines */
+}
+
+/* Second, fourth, sixth paragraphs (Japanese) - much larger */
+.drew-notification-content ::deep p:nth-of-type(2),
+.drew-notification-content ::deep p:nth-of-type(4),
+.drew-notification-content ::deep p:nth-of-type(6) {
+    font-size: 2.5rem !important; /* Japanese line - much larger */
+    font-weight: 500;
+}
+
+.drew-notification-content :deep(p:first-child) {
+    margin-top: 0;
+}
+
+.drew-notification-content :deep(p:last-child) {
+    margin-bottom: 0;
+}
+
+.drew-notification-content :deep(strong),
+.drew-notification-content :deep(b) {
+    font-weight: 700;
+    color: #764ba2;
+}
+
+.drew-notification-content :deep(em),
+.drew-notification-content :deep(i) {
+    font-style: italic;
+}
+
+.drew-notification-content :deep(code) {
+    background-color: #f5f5f5;
+    padding: 0.2em 0.4em;
+    border-radius: 3px;
+    font-size: 0.9em;
+    font-family: 'Consolas', 'Monaco', monospace;
+    color: #e83e8c;
+}
+
+.drew-notification-content :deep(ul),
+.drew-notification-content :deep(ol) {
+    margin: 0.5em 0;
+    padding-left: 1.5em;
+}
+
+.drew-notification-content :deep(li) {
+    margin: 0.3em 0;
+}
+
+.drew-notification-content :deep(a) {
+    color: #764ba2;
+    text-decoration: underline;
+}
+
+.drew-notification-content :deep(a:hover) {
+    color: #5a3780;
+}
+
+.drew-notification-content :deep(h1),
+.drew-notification-content :deep(h2),
+.drew-notification-content :deep(h3) {
+    margin: 0.5em 0;
+    font-weight: 700;
+    color: #2B2D42;
+}
+
+.drew-notification-content :deep(h1) {
+    font-size: 1.4em;
+}
+
+.drew-notification-content :deep(h2) {
+    font-size: 1.2em;
+}
+
+.drew-notification-content :deep(h3) {
+    font-size: 1.1em;
+}
+
+.drew-notification-tail {
+    position: absolute;
+    right: -10px;
+    bottom: 30px;
+    width: 0;
+    height: 0;
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+    border-left: 10px solid white;
+}
+
+@keyframes slideInFromRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}

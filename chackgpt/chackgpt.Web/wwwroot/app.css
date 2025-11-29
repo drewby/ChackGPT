@@ -1,0 +1,346 @@
+html, body {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+a, .btn-link {
+    color: #006bb7;
+}
+
+.btn-primary {
+    color: #fff;
+    background-color: #1b6ec2;
+    border-color: #1861ac;
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+.content {
+    padding-top: 1.1rem;
+}
+
+h1:focus {
+    outline: none;
+}
+
+.valid.modified:not([type=checkbox]) {
+    outline: 1px solid #26b050;
+}
+
+.invalid {
+    outline: 1px solid #e51140;
+}
+
+.validation-message {
+    color: #e51140;
+}
+
+.blazor-error-boundary {
+    background: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTYiIGhlaWdodD0iNDkiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIG92ZXJmbG93PSJoaWRkZW4iPjxkZWZzPjxjbGlwUGF0aCBpZD0iY2xpcDAiPjxyZWN0IHg9IjIzNSIgeT0iNTEiIHdpZHRoPSI1NiIgaGVpZ2h0PSI0OSIvPjwvY2xpcFBhdGg+PC9kZWZzPjxnIGNsaXAtcGF0aD0idXJsKCNjbGlwMCkiIHRyYW5zZm9ybT0idHJhbnNsYXRlKC0yMzUgLTUxKSI+PHBhdGggZD0iTTI2My41MDYgNTFDMjY0LjcxNyA1MSAyNjUuODEzIDUxLjQ4MzcgMjY2LjYwNiA1Mi4yNjU4TDI2Ny4wNTIgNTIuNzk4NyAyNjcuNTM5IDUzLjYyODMgMjkwLjE4NSA5Mi4xODMxIDI5MC41NDUgOTIuNzk1IDI5MC42NTYgOTIuOTk2QzI5MC44NzcgOTMuNTEzIDI5MSA5NC4wODE1IDI5MSA5NC42NzgyIDI5MSA5Ny4wNjUxIDI4OS4wMzggOTkgMjg2LjYxNyA5OUwyNDAuMzgzIDk5QzIzNy45NjMgOTkgMjM2IDk3LjA2NTEgMjM2IDk0LjY3ODIgMjM2IDk0LjM3OTkgMjM2LjAzMSA5NC4wODg2IDIzNi4wODkgOTMuODA3MkwyMzYuMzM4IDkzLjAxNjIgMjM2Ljg1OCA5Mi4xMzE0IDI1OS40NzMgNTMuNjI5NCAyNTkuOTYxIDUyLjc5ODUgMjYwLjQwNyA1Mi4yNjU4QzI2MS4yIDUxLjQ4MzcgMjYyLjI5NiA1MSAyNjMuNTA2IDUxWk0yNjMuNTg2IDY2LjAxODNDMjYwLjczNyA2Ni4wMTgzIDI1OS4zMTMgNjcuMTI0NSAyNTkuMzEzIDY5LjMzNyAyNTkuMzEzIDY5LjYxMDIgMjU5LjMzMiA2OS44NjA4IDI1OS4zNzEgNzAuMDg4N0wyNjEuNzk1IDg0LjAxNjEgMjY1LjM4IDg0LjAxNjEgMjY3LjgyMSA2OS43NDc1QzI2Ny44NiA2OS43MzA5IDI2Ny44NzkgNjkuNTg3NyAyNjcuODc5IDY5LjMxNzkgMjY3Ljg3OSA2Ny4xMTgyIDI2Ni40NDggNjYuMDE4MyAyNjMuNTg2IDY2LjAxODNaTTI2My41NzYgODYuMDU0N0MyNjEuMDQ5IDg2LjA1NDcgMjU5Ljc4NiA4Ny4zMDA1IDI1OS43ODYgODkuNzkyMSAyNTkuNzg2IDkyLjI4MzcgMjYxLjA0OSA5My41Mjk1IDI2My41NzYgOTMuNTI5NSAyNjYuMTE2IDkzLjUyOTUgMjY3LjM4NyA5Mi4yODM3IDI2Ny4zODcgODkuNzkyMSAyNjcuMzg3IDg3LjMwMDUgMjY2LjExNiA4Ni4wNTQ3IDI2My41NzYgODYuMDU0N1oiIGZpbGw9IiNGRkU1MDAiIGZpbGwtcnVsZT0iZXZlbm9kZCIvPjwvZz48L3N2Zz4=) no-repeat 1rem/1.8rem, #b32121;
+    padding: 1rem 1rem 1rem 3.7rem;
+    color: white;
+}
+
+    .blazor-error-boundary::after {
+        content: "An error has occurred."
+    }
+
+.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
+    color: var(--bs-secondary-color);
+    text-align: end;
+}
+
+.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
+    text-align: start;
+}
+
+/* Markdown content styling */
+.markdown-content {
+    line-height: 1.8;
+}
+
+/* Chat message text styling */
+.chat-message-text {
+    font-size: 1rem;
+}
+
+.markdown-content h1,
+.markdown-content h2,
+.markdown-content h3,
+.markdown-content h4,
+.markdown-content h5,
+.markdown-content h6 {
+    margin-top: 1em;
+    margin-bottom: 0.5em;
+    font-weight: 600;
+}
+
+.markdown-content h1 {
+    font-size: 1.5em;
+    border-bottom: 1px solid var(--neutral-stroke-rest);
+    padding-bottom: 0.3em;
+}
+
+.markdown-content h2 {
+    font-size: 1.3em;
+}
+
+.markdown-content h3 {
+    font-size: 1.1em;
+}
+
+/* Bilingual text styling - paragraphs with line breaks */
+.markdown-content p {
+    margin: 0.5em 0;
+    font-size: 0.9rem; /* English text - smaller */
+    display: block;
+}
+
+/* Style line breaks to create visual separation */
+.markdown-content p br {
+    display: block;
+    content: "";
+    margin: 0.2em 0;
+}
+
+/* Target text after br (Japanese) using a pseudo-element approach won't work */
+/* So we'll make the entire paragraph larger and rely on font rendering */
+.markdown-content p {
+    font-size: 1rem; /* Base size */
+}
+
+/* For separate paragraphs (if agents use proper formatting) */
+.markdown-content p:nth-of-type(2n) {
+    font-size: 2.5rem;
+    font-weight: 500;
+}
+
+.markdown-content p:nth-of-type(2n+1) {
+    font-size: 1rem;
+}
+
+.markdown-content ul,
+.markdown-content ol {
+    margin: 0.5em 0;
+    padding-left: 2em;
+}
+
+.markdown-content li {
+    margin: 0.25em 0;
+}
+
+.markdown-content code {
+    background-color: rgba(110, 118, 129, 0.1);
+    padding: 0.2em 0.4em;
+    border-radius: 3px;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 0.9em;
+    color: #c7254e;
+}
+
+.markdown-content pre {
+    background-color: rgba(110, 118, 129, 0.08);
+    border: 1px solid var(--neutral-stroke-rest);
+    border-radius: 6px;
+    padding: 1em;
+    overflow-x: auto;
+    margin: 0.5em 0;
+}
+
+.markdown-content pre code {
+    background-color: transparent;
+    padding: 0;
+    font-size: 0.9em;
+    color: inherit;
+}
+
+/* Prism.js code highlighting overrides for FluentUI design system */
+.markdown-content pre[class*="language-"] {
+    background-color: rgba(110, 118, 129, 0.08);
+    border: 1px solid var(--neutral-stroke-rest);
+}
+
+.markdown-content code[class*="language-"] {
+    color: inherit;
+    background: none;
+}
+
+.markdown-content blockquote {
+    border-left: 4px solid var(--neutral-stroke-rest);
+    padding-left: 1em;
+    margin: 0.5em 0;
+    color: var(--neutral-foreground-rest);
+    font-style: italic;
+}
+
+.markdown-content a {
+    color: var(--accent-fill-rest);
+    text-decoration: none;
+}
+
+.markdown-content a:hover {
+    text-decoration: underline;
+}
+
+.markdown-content table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1em 0;
+    font-size: 1.8rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.markdown-content table th,
+.markdown-content table td {
+    border: 1px solid rgba(102, 126, 234, 0.2);
+    padding: 0.4em 1em;
+    text-align: left;
+}
+
+.markdown-content table th {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    font-weight: 600;
+    font-size: 1.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.markdown-content table tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+.markdown-content table tbody tr:nth-child(odd) {
+    background-color: rgba(102, 126, 234, 0.03);
+}
+
+.markdown-content table tbody tr:hover {
+    background-color: rgba(102, 126, 234, 0.08);
+}
+
+/* Number column styling */
+.markdown-content table td:first-child {
+    font-weight: 700;
+    font-size: 2.2rem;
+    text-align: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    width: 80px;
+    position: relative;
+}
+
+.markdown-content table td:first-child::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+    border-radius: 50%;
+    z-index: -1;
+}
+
+.markdown-content table th:first-child {
+    text-align: center;
+    width: 80px;
+}
+
+.markdown-content hr {
+    border: none;
+    border-top: 1px solid var(--neutral-stroke-rest);
+    margin: 1em 0;
+}
+
+.markdown-content strong {
+    font-weight: 600;
+}
+
+.markdown-content em {
+    font-style: italic;
+}
+
+/* Notification balloon bilingual text styling */
+.chat-notification-content p,
+.drew-notification-content p {
+    margin: 0.5em 0;
+    font-size: 1rem !important; /* English line - smaller (default) */
+    line-height: 1.6;
+}
+
+/* Odd paragraphs (English) in notification balloons */
+.chat-notification-content p:nth-of-type(odd),
+.drew-notification-content p:nth-of-type(odd) {
+    font-size: 1rem !important;
+}
+
+/* Even paragraphs (Japanese) in notification balloons */
+.chat-notification-content p:nth-of-type(even),
+.drew-notification-content p:nth-of-type(even) {
+    font-size: 2.5rem !important;
+    font-weight: 500;
+    line-height: 1.4;
+}
+
+/* User message text - same size as Japanese */
+.user-message-text {
+    font-size: 2.5rem !important;
+    font-weight: 500;
+}
+
+/* Chat input textarea */
+.chat-input-textarea {
+    flex: 1;
+    min-height: 60px;
+    padding: 12px;
+    border: 1px solid var(--neutral-stroke-rest);
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 2.5rem;
+    resize: vertical;
+    line-height: 1.4;
+}
+
+.chat-input-textarea:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Chat send button - Aspire blue/purple style */
+.chat-send-button {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 12px 32px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.chat-send-button:hover:not(:disabled) {
+    background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.chat-send-button:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.chat-send-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+

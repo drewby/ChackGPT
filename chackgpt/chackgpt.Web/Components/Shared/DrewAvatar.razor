@@ -1,0 +1,79 @@
+@rendermode InteractiveServer
+@using Markdig.Extensions.Alerts
+@using Microsoft.AspNetCore.SignalR.Client
+@using chackgpt.Web.Services
+@inject NavigationManager Navigation
+@inject IChatMessageService ChatMessageService
+@implements IAsyncDisposable
+
+@if (isVisible)
+{
+    <div class="drew-avatar">
+        <img src="/images/drew/drew-@(currentEmotion).png" 
+             alt="DrewGPT Avatar - @currentEmotion emotion" 
+             class="drew-image" />
+    </div>
+}
+
+@inject ILogger<DrewAvatar> Logger
+
+@code {
+    private HubConnection? hubConnection;
+    private string currentEmotion = "neutral";
+    private bool isVisible = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Logger.LogInformation("🎭 DrewAvatar initializing...");
+
+        
+        // Connect to SignalR hub to receive emotion changes
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl(Navigation.ToAbsoluteUri("/chathub"))
+            .WithAutomaticReconnect()
+            .Build();
+
+        // Listen for agent changes - show avatar when DrewGPT becomes active
+        hubConnection.On<string>("AgentChanged", (agentName) =>
+        {
+            Logger.LogInformation("🎭 DrewAvatar received AgentChanged event: {AgentName}", agentName);
+            if (agentName == "DrewGPT")
+            {   
+                Logger.LogInformation("🎭 DrewAvatar making avatar visible for DrewGPT");
+                isVisible = true;
+                InvokeAsync(StateHasChanged);
+            }
+        });
+
+        // Listen for Drew emotion changes
+        hubConnection.On<string>("DrewEmotionChanged", (emotion) =>
+        {
+            Logger.LogInformation("🎭 DrewAvatar received DrewEmotionChanged: {Emotion}", emotion);
+            currentEmotion = emotion;
+            Logger.LogInformation("🎭 DrewAvatar updated currentEmotion to: {CurrentEmotion}", currentEmotion);
+            InvokeAsync(StateHasChanged);
+        });
+
+        try
+        {
+            await hubConnection.StartAsync();
+            Logger.LogInformation("✅ DrewAvatar SignalR connection established");
+        }
+        catch (Exception ex)
+        {
+            Logger.LogWarning(ex, "⚠️ DrewAvatar failed to connect to SignalR hub");
+            // If connection fails, avatar will show neutral emotion
+            // This is acceptable as the avatar is decorative
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        
+        if (hubConnection is not null)
+        {
+            Logger.LogInformation("🎭 DrewAvatar disposing SignalR connection");
+            await hubConnection.DisposeAsync();
+        }
+    }
+}

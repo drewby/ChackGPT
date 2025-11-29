@@ -1,0 +1,298 @@
+{
+  "decks": [
+    {
+      "topic": "dotnet10",
+      "slides": [
+        {
+          "title": "Announcing .NET 10",
+          "description": "",
+          "bullets": [
+            "Faster, more elegant, and extensible code with C# 14",
+            "Industry leading performance with improvements to help apps launch quicker, run smoother, and scale effortlessly",
+            "Supercharged SDK and libraries let you build more secure and future-ready apps with confidence",
+            "Modern features for web, cloud, mobile, and cross-platform development designed for today and tomorrow's workloads",
+            "Long-Term Support (LTS) release"
+          ],
+          "currentSlideNumber": 1,
+          "totalSlides": 4,
+          "topic": "dotnet10",
+          "language": "en",
+          "layout": "hero-with-image",
+          "badge": "RELEASED",
+          "imagePath": "/images/presentations/dotnet10/hero-robot.png",
+          "imageAlt": ".NET 10 robot mascot",
+          "url": "get.dot.net/10"
+        },
+        {
+          "title": "Visual Studio 2026",
+          "description": "",
+          "bullets": [
+            "Optimized for .NET 10 and C++, and ready to grow with you with monthly feature updates",
+            "Instant startup with solutions loading up to 50% faster and a quicker build, edit, debug cycle even on massive codebases",
+            "Modern design with Fluent UI makes it lighter and easier to navigate and stay focused on code, not the tool",
+            "AI that works for you with new GitHub Copilot capabilities for profiling, testing, and modernization"
+          ],
+          "currentSlideNumber": 2,
+          "totalSlides": 4,
+          "topic": "dotnet10",
+          "language": "en",
+          "layout": "hero-with-image",
+          "badge": "RELEASED",
+          "imagePath": "/images/presentations/dotnet10/vs2026-screenshot.png",
+          "imageAlt": "Visual Studio 2026 IDE screenshot",
+          "url": "visualstudio.com/download"
+        },
+        {
+          "title": ".NET 10",
+          "description": "Secure, fast, future-ready",
+          "sections": [
+            {
+              "icon": "rocket",
+              "title": "Runtime",
+              "content": "Performance improvements, Just-In-Time (JIT) compiler optimizations, improved Garbage Collector (GC), AVX10.2 support for cutting-edge Intel silicon"
+            },
+            {
+              "icon": "sdk",
+              "title": ".NET SDK",
+              "content": "File-based apps with publish support & native AOT, natively create container images, Microsoft.Testing.Platform support in dotnet test, tab-completion scripts for popular shells"
+            },
+            {
+              "icon": "library",
+              "title": ".NET Libraries",
+              "content": "MEAI enhancements, first-class support for MCP, new APIs in cryptography, globalization, numerics, serialization, collections, diagnostics, new JSON serialization options, networking enhancements"
+            },
+            {
+              "icon": "security",
+              "title": "Security",
+              "content": "Security & cryptography enhancements, including Windows Cryptography API: Next Generation (CNG) support for Post-quantum Cryptography (PQC)"
+            },
+            {
+              "icon": "web",
+              "title": "ASP.NET Core",
+              "content": "Simple security with WebAuthN & passkeys, validation for Minimal APIs, OpenAPI 3.1, enhanced app observability & diagnostics, smarter memory management, and improved JSON Patch handling"
+            },
+            {
+              "icon": "blazor",
+              "title": "Blazor",
+              "content": "Improved scalability & reliability with declarative state persistence, complex form validation, QuickGrid enhancements, WebAssembly diagnostics, streamlined JavaScript interop, automated browser testing"
+            },
+            {
+              "icon": "mobile",
+              "title": ".NET MAUI",
+              "content": "Editing, build & runtime performance, Aspire integration, many control enhancements and quality improvements, support for latest platform versions including Xcode 26, Android API 35 & 36"
+            },
+            {
+              "icon": "database",
+              "title": "EF Core",
+              "content": "LINQ enhancements, performance optimizations, improved support for Azure Cosmos DB, and named query filters"
+            }
+          ],
+          "currentSlideNumber": 3,
+          "totalSlides": 4,
+          "topic": "dotnet10",
+          "language": "en",
+          "layout": "grid-sections"
+        },
+        {
+          "title": "C# 14",
+          "description": "Faster, extensible, elegant",
+          "bullets": [
+            "Null-conditional assignment",
+            "`field` backed properties",
+            "Extension members",
+            "Modifiers on simple lambda parameters",
+            "`nameof` supports unbound generic types",
+            "Implicit conversions for `Span<T>` and `ReadOnlySpan<T>`",
+            "Partial events and constructors",
+            "User defined compound assignment operators"
+          ],
+          "currentSlideNumber": 4,
+          "totalSlides": 4,
+          "topic": "dotnet10",
+          "language": "en",
+          "layout": "hero-with-image",
+          "imagePath": "/images/presentations/csharp14/code-examples.png",
+          "imageAlt": "C# 14 code examples showing field keyword and other features"
+        }
+      ]
+    },
+    {
+      "topic": "intelligence",
+      "slides": [
+        {
+          "title": "Microsoft Agent Framework",
+          "description": "",
+          "bullets": [
+            "Unified foundation for building AI agents and multi-agent workflows",
+            "Interactive developer UI for agent development, testing, and debugging workflows",
+            "Built on open standards for interoperability and flexibility",
+            "Community-driven, open-source and extensible by design"
+          ],
+          "currentSlideNumber": 1,
+          "totalSlides": 4,
+          "topic": "intelligence",
+          "language": "en",
+          "layout": "hero-with-image",
+          "badge": "PUBLIC PREVIEW",
+          "imagePath": "/images/presentations/intelligence/agent-framework-dev-ui.png",
+          "imageAlt": "Microsoft Agent Framework developer UI showing multi-agent content creation workflow with Writer, Reviewer, and Editor agents",
+          "url": "aka.ms/AgentFramework"
+        },
+        {
+          "title": "Model Context Protocol (MCP)",
+          "description": "MCP Clients call tools, request resources, and get prompts. MCP Servers expose tools, resources, and prompts. Examples include Visual Studio Code, Claude, GitHub on the client side, and custom MCP servers built with C# using the MCP C# SDK on the server side.",
+          "currentSlideNumber": 2,
+          "totalSlides": 4,
+          "topic": "intelligence",
+          "language": "en",
+          "layout": "title-and-image",
+          "imagePath": "/images/presentations/intelligence/mcp-architecture.png",
+          "imageAlt": "Model Context Protocol architecture diagram showing MCP Clients and MCP Servers with bidirectional communication"
+        },
+        {
+          "title": "An agent enhanced by MCP",
+          "description": "Architecture diagram showing how an agent processes input from system events, user messages, and agent messages through an LLM with instructions and tools, then outputs agent messages and tool results. The agent connects to a custom MCP server built with the MCP C# SDK.",
+          "currentSlideNumber": 3,
+          "totalSlides": 4,
+          "topic": "intelligence",
+          "language": "en",
+          "layout": "title-and-image",
+          "imagePath": "/images/presentations/intelligence/agent-mcp-architecture.png",
+          "imageAlt": "Agent architecture diagram showing input processing through LLM and connection to MCP server"
+        },
+        {
+          "title": "MCP C# SDK",
+          "description": "",
+          "bullets": [
+            "Full support for current MCP spec",
+            "Tools, resources, prompts",
+            "Elicitation, sampling",
+            "Stdio and HTTP transports",
+            "Widely used across Microsoft",
+            "More features accepted and coming soon"
+          ],
+          "currentSlideNumber": 4,
+          "totalSlides": 4,
+          "topic": "intelligence",
+          "language": "en",
+          "layout": "hero-with-image",
+          "badge": "PUBLIC PREVIEW",
+          "imagePath": "/images/presentations/intelligence/mcp-sdk-logo.png",
+          "imageAlt": "Model Context Protocol logo",
+          "url": "aka.ms/mcp-cs-sdk"
+        }
+      ]
+    },
+    {
+      "topic": "aspire13",
+      "slides": [
+        {
+          "title": "Aspire",
+          "description": "Code-first, extensible, observable",
+          "sections": [
+            {
+              "icon": "code",
+              "title": "Aspire AppHost + CLI",
+              "content": "Define your stack in **code** — type-safe, readable, and **debuggable**. Aspire runs it all locally, then shifts to **real cloud services.**"
+            },
+            {
+              "icon": "integrations",
+              "title": "Aspire Integrations",
+              "content": "Plug in **any code or service**, whether it's local or remote. Aspire brings **common patterns** – but can model **anything**."
+            },
+            {
+              "icon": "dashboard",
+              "title": "Aspire Dashboard",
+              "content": "See your **entire stack** running in one place – all your **logs**, **endpoints**, **environment** variables, even full **OpenTelemetry**."
+            }
+          ],
+          "currentSlideNumber": 1,
+          "totalSlides": 2,
+          "topic": "aspire13",
+          "language": "en",
+          "layout": "left-content-right-image",
+          "imagePath": "/images/presentations/aspire13/architecture-diagram.png",
+          "imageAlt": "Aspire architecture diagram showing connected services"
+        },
+        {
+          "title": "Aspire 13.0",
+          "description": "",
+          "bullets": [
+            "Unified infrastructure across .NET, JavaScript, and Python with debugging, container-deployment, auto-generated Dockerfiles",
+            "Modern development experience with CLI enhancements, single-file AppHost support, and quicker onboarding",
+            "Seamless build & deployment, built in static file site support, and robust deploy parallelization",
+            "Enterprise-ready infrastructure & services with flexible connection strings and certificate trust across languages and containers"
+          ],
+          "currentSlideNumber": 2,
+          "totalSlides": 2,
+          "topic": "aspire13",
+          "language": "en",
+          "layout": "hero-with-image",
+          "badge": "RELEASED",
+          "imagePath": "/images/presentations/aspire13/dashboard-screenshot.png",
+          "imageAlt": "Aspire Dashboard showing distributed trace details",
+          "url": "Aspire.dev"
+        }
+      ]
+    },
+    {
+      "topic": "dotnet10platform",
+      "slides": [
+        {
+          "title": "ASP.NET Core 10",
+          "description": "Modern Web Apps & APIs",
+          "bullets": [
+            "Blazor WebAssembly preloading for faster startup",
+            "Automatic memory pool eviction for high throughput",
+            "First-class OpenAPI 3.1 support for minimal APIs",
+            "Identity management updates with Passkeys (FIDO2) support",
+            "New `RedirectHttpResult.IsLocalUrl` helper for security"
+          ],
+          "currentSlideNumber": 1,
+          "totalSlides": 3,
+          "topic": "dotnet10platform",
+          "language": "en",
+          "layout": "hero-with-image",
+          "imagePath": "/images/presentations/aspnet10/web-development.svg",
+          "imageAlt": "ASP.NET Core 10 web development abstract visualization"
+        },
+        {
+          "title": ".NET 10 Libraries",
+          "description": "New APIs & Improvements",
+          "bullets": [
+            "New `FindUtf8` method in `PemEncoding` for direct UTF-8 processing",
+            "Post-quantum cryptography (PQC) support with ML-KEM, ML-DSA, and SLH-DSA",
+            "`ISOWeek` support for `DateOnly` type",
+            "`WebSocketStream` for simplified WebSocket scenarios",
+            "TLS 1.3 support for macOS client"
+          ],
+          "currentSlideNumber": 2,
+          "totalSlides": 3,
+          "topic": "dotnet10platform",
+          "language": "en",
+          "layout": "hero-with-image",
+          "imagePath": "/images/presentations/dotnetlib10/libraries-structure.svg",
+          "imageAlt": ".NET 10 Libraries code structure visualization"
+        },
+        {
+          "title": ".NET 10 SDK & Tooling",
+          "description": "Developer Productivity & Cloud-Native",
+          "bullets": [
+            "Platform-specific .NET tools with multi-RID support",
+            "One-shot tool execution with `dotnet tool exec`",
+            "Native shell tab-completion scripts for bash, zsh, fish, etc.",
+            "File-based apps with publish support and native AOT",
+            "`dotnet test` native support for Microsoft.Testing.Platform"
+          ],
+          "currentSlideNumber": 3,
+          "totalSlides": 3,
+          "topic": "dotnet10platform",
+          "language": "en",
+          "layout": "hero-with-image",
+          "imagePath": "/images/presentations/sdktooling10/cli-interface.png",
+          "imageAlt": ".NET 10 SDK command line interface abstract"
+        }
+      ]
+    }
+  ]
+}

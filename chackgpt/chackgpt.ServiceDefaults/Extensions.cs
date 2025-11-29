@@ -1,0 +1,149 @@
+using System.Diagnostics;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.ServiceDiscovery;
+using OpenTelemetry;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Trace;
+
+namespace Microsoft.Extensions.Hosting;
+
+// Adds common Aspire services: service discovery, resilience, health checks, and OpenTelemetry.
+// This project should be referenced by each service project in your solution.
+// To learn more about using this project, see https://aka.ms/dotnet/aspire/service-defaults
+public static class Extensions
+{
+    private const string HealthEndpointPath = "/health";
+    private const string AlivenessEndpointPath = "/alive";
+
+    public static TBuilder AddServiceDefaults<TBuilder>(this TBuilder builder) where TBuilder : IHostApplicationBuilder
+    {
+        builder.ConfigureOpenTelemetry();
+
+        builder.AddDefaultHealthChecks();
+
+        builder.Services.AddServiceDiscovery();
+
+        builder.Services.ConfigureHttpClientDefaults(http =>
+        {
+            // Turn on resilience by default
+            http.AddStandardResilienceHandler();
+
+            // Turn on service discovery by default
+            http.AddServiceDiscovery();
+        });
+
+        // Uncomment the following to restrict the allowed schemes for service discovery.
+        // builder.Services.Configure<ServiceDiscoveryOptions>(options =>
+        // {
+        //     options.AllowedSchemes = ["https"];
+        // });
+
+        return builder;
+    }
+
+    public static TBuilder ConfigureOpenTelemetry<TBuilder>(this TBuilder builder) where TBuilder : IHostApplicationBuilder
+    {
+        builder.Logging.AddOpenTelemetry(logging =>
+        {
+            logging.IncludeFormattedMessage = true;
+            logging.IncludeScopes = true;
+        })
+        // Add AI telemetry trace sources for Microsoft Agent Framework and Microsoft.Extensions.AI
+        .AddTraceSource("Experimental.Microsoft.Extensions.AI.*");
+
+        builder.Services.AddOpenTelemetry()
+            .WithMetrics(metrics =>
+            {
+                metrics.AddAspNetCoreInstrumentation()
+                    .AddHttpClientInstrumentation()
+                    .AddRuntimeInstrumentation()
+                    // Add AI metrics for Microsoft Agent Framework and Microsoft.Extensions.AI
+                    .AddMeter("Experimental.Microsoft.Extensions.AI.*");
+            })
+            .WithTracing(tracing =>
+            {
+                tracing.AddSource(builder.Environment.ApplicationName)
+                    .AddSource("Experimental.Microsoft.Extensions.AI.*")
+                    .AddSource("Experimental.ModelContextProtocol.*")
+                    .AddSource("ChackGPT.Agent")
+                    .AddSource("ChackGPT.ChatHub")
+                    .AddAspNetCoreInstrumentation(tracing =>
+                        // Exclude health check requests from tracing
+                        tracing.Filter = context =>
+                            !context.Request.Path.StartsWithSegments(HealthEndpointPath)
+                            && !context.Request.Path.StartsWithSegments(AlivenessEndpointPath)
+                    )
+                    .AddHttpClientInstrumentation()
+                    .AddProcessor(new FilteringActivityProcessor(activity =>
+                    {
+                        var activityName = activity.DisplayName;
+                        return !activityName.Contains("ComponentHub/OnRenderCompleted") 
+                            && !activityName.Contains("ComponentHub/EndInvokeJSFromDotNet");
+                    }));
+            });
+
+        builder.AddOpenTelemetryExporters();
+
+        return builder;
+    }
+
+    private static TBuilder AddOpenTelemetryExporters<TBuilder>(this TBuilder builder) where TBuilder : IHostApplicationBuilder
+    {
+        var useOtlpExporter = !string.IsNullOrWhiteSpace(builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"]);
+
+        if (useOtlpExporter)
+        {
+            builder.Services.AddOpenTelemetry().UseOtlpExporter();
+        }
+
+        return builder;
+    }
+
+    public static TBuilder AddDefaultHealthChecks<TBuilder>(this TBuilder builder) where TBuilder : IHostApplicationBuilder
+    {
+        builder.Services.AddHealthChecks()
+            .AddCheck("self", () => HealthCheckResult.Healthy(), ["live"]);
+
+        return builder;
+    }
+
+    public static WebApplication MapDefaultEndpoints(this WebApplication app)
+    {
+        if (app.Environment.IsDevelopment())
+        {
+            app.MapHealthChecks(HealthEndpointPath);
+            app.MapHealthChecks(AlivenessEndpointPath, new HealthCheckOptions
+            {
+                Predicate = r => r.Tags.Contains("live")
+            });
+        }
+
+        return app;
+    }
+}
+
+/// <summary>
+/// Activity processor that filters out activities based on a predicate.
+/// Used to reduce noise in distributed tracing by excluding low-value traces.
+/// </summary>
+internal sealed class FilteringActivityProcessor : BaseProcessor<Activity>
+{
+    private readonly Func<Activity, bool> _predicate;
+
+    public FilteringActivityProcessor(Func<Activity, bool> predicate)
+    {
+        _predicate = predicate ?? throw new ArgumentNullException(nameof(predicate));
+    }
+
+    public override void OnEnd(Activity activity)
+    {
+        if (!_predicate(activity))
+        {
+            activity.ActivityTraceFlags &= ~ActivityTraceFlags.Recorded;
+        }
+    }
+}

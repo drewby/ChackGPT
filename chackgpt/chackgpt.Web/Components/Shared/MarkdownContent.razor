@@ -1,0 +1,52 @@
+@using Markdig
+@using Microsoft.AspNetCore.Components
+@using Microsoft.JSInterop
+@inject IJSRuntime JSRuntime
+
+@* Renders markdown content as HTML using Markdig with GitHub Flavored Markdown support *@
+@((MarkupString)htmlContent)
+
+@code {
+    /// <summary>
+    /// The markdown content to render
+    /// </summary>
+    [Parameter]
+    public string Content { get; set; } = string.Empty;
+
+    private string htmlContent = string.Empty;
+
+    // Configure Markdig pipeline with GitHub Flavored Markdown extensions
+    private static readonly MarkdownPipeline pipeline = new MarkdownPipelineBuilder()
+        .UseAdvancedExtensions() // Includes tables, task lists, auto-links, etc.
+        .Build();
+
+    protected override void OnParametersSet()
+    {
+        // Convert markdown to HTML using Markdig
+        // The HTML is rendered safely using MarkupString
+        if (!string.IsNullOrWhiteSpace(Content))
+        {
+            htmlContent = Markdown.ToHtml(Content, pipeline);
+        }
+        else
+        {
+            htmlContent = string.Empty;
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        // Trigger Prism.js syntax highlighting after rendering
+        if (!string.IsNullOrWhiteSpace(htmlContent))
+        {
+            try
+            {
+                await JSRuntime.InvokeVoidAsync("Prism.highlightAll");
+            }
+            catch
+            {
+                // Prism.js may not be loaded yet, ignore errors
+            }
+        }
+    }
+}

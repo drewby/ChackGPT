@@ -3,6 +3,9 @@
 # Copilot tracking
 .copilot-tracking/
 
+# Videos
+*.mp4
+
 # User-specific files
 *.rsuser
 *.suo

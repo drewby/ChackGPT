@@ -1,0 +1,171 @@
+@rendermode InteractiveServer
+@using Microsoft.AspNetCore.SignalR.Client
+@using chackgpt.Web.Models
+@using chackgpt.Web.Services
+@using System.Text.Json
+@inject NavigationManager Navigation
+@inject IChatMessageService ChatMessageService
+@implements IAsyncDisposable
+
+@if (isVisible && currentVideo != null)
+{
+    <div class="video-popup-overlay" @onclick="CloseVideo">
+        <div class="video-popup-content" @onclick:stopPropagation="true">
+            <video class="video-player" 
+                   src="@currentVideo.VideoUrl" 
+                   controls 
+                   autoplay
+                   preload="auto"
+                   @ref="videoElement">
+                Your browser does not support the video tag.
+            </video>
+            <button class="video-close-button" @onclick="CloseVideo" aria-label="Close video">×</button>
+        </div>
+    </div>
+}
+
+<style>
+    .video-popup-overlay {
+        position: fixed;
+        top: 0;
+        left: 250px;
+        right: 0;
+        bottom: 0;
+        background-color: black;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+        animation: fadeIn 0.3s ease-in;
+    }
+
+    .video-popup-content {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .video-player {
+        max-width: 100%;
+        max-height: 100%;
+        height: 100%;
+        width: auto;
+        object-fit: contain;
+    }
+
+    .video-close-button {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: rgba(0, 0, 0, 0.7);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        color: white;
+        font-size: 3rem;
+        line-height: 1;
+        cursor: pointer;
+        padding: 10px 20px;
+        border-radius: 8px;
+        transition: all 0.2s;
+        z-index: 10001;
+    }
+
+    .video-close-button:hover {
+        background: rgba(255, 255, 255, 0.2);
+        border-color: rgba(255, 255, 255, 0.6);
+        transform: scale(1.1);
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+</style>
+
+@inject ILogger<VideoPopup> Logger
+
+@code {
+    private HubConnection? hubConnection;
+    private bool isVisible = false;
+    private VideoDisplayInfo? currentVideo = null;
+    private ElementReference videoElement;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Logger.LogInformation("🎬 VideoPopup initializing...");
+        
+        // Connect to SignalR hub to receive video display events
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl(Navigation.ToAbsoluteUri("/chathub"))
+            .WithAutomaticReconnect()
+            .Build();
+
+        // Listen for video display requests
+        hubConnection.On<string>("VideoDisplayRequested", async (videoJson) =>
+        {
+            Logger.LogInformation("🎬 VideoPopup received VideoDisplayRequested");
+            try
+            {
+                currentVideo = JsonSerializer.Deserialize<VideoDisplayInfo>(videoJson);
+                if (currentVideo != null)
+                {
+                    // Briefly set to false then true to trigger notification balloon reset
+                    // This ensures the balloon clears when switching between videos
+                    ChatMessageService.IsPopupVisible = false;
+                    isVisible = true;
+                    ChatMessageService.IsPopupVisible = true;
+                    Logger.LogInformation("🎬 VideoPopup displaying: {Title} ({Id})", 
+                        currentVideo.Title, currentVideo.Id);
+                    await InvokeAsync(StateHasChanged);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "❌ Failed to deserialize video info");
+            }
+        });
+
+        // Listen for video close requests
+        hubConnection.On("VideoCloseRequested", async () =>
+        {
+            Logger.LogInformation("🎬 VideoPopup received VideoCloseRequested");
+            isVisible = false;
+            currentVideo = null;
+            ChatMessageService.IsPopupVisible = false;
+            await InvokeAsync(StateHasChanged);
+        });
+
+        try
+        {
+            await hubConnection.StartAsync();
+            Logger.LogInformation("✅ VideoPopup SignalR connection established");
+        }
+        catch (Exception ex)
+        {
+            Logger.LogWarning(ex, "⚠️ VideoPopup failed to connect to SignalR hub");
+        }
+    }
+
+    private void CloseVideo()
+    {
+        Logger.LogInformation("🎬 VideoPopup closing video");
+        isVisible = false;
+        currentVideo = null;
+        ChatMessageService.IsPopupVisible = false;
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (hubConnection is not null)
+        {
+            Logger.LogInformation("🎬 VideoPopup disposing SignalR connection");
+            await hubConnection.DisposeAsync();
+        }
+    }
+}

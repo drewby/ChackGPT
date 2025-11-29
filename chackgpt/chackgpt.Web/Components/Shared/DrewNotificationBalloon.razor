@@ -1,0 +1,173 @@
+@rendermode InteractiveServer
+@using chackgpt.Web.Services
+@using chackgpt.Web.Components.Shared
+@using Microsoft.AspNetCore.SignalR.Client
+@inject IChatMessageService ChatMessageService
+@inject NavigationManager Navigation
+@inject ILogger<DrewNotificationBalloon> Logger
+@implements IAsyncDisposable
+
+@if (showNotification && !string.IsNullOrEmpty(notificationMessage))
+{
+    <div class="drew-notification-balloon" @onclick="CloseNotification">
+        <img src="/images/drew/drew-chatbubble.png" alt="DrewGPT" class="drew-notification-avatar" />
+        <div class="drew-notification-content">
+            <MarkdownContent Content="@notificationMessage" />
+        </div>
+        <div class="drew-notification-tail"></div>
+    </div>
+}
+
+@code {
+    private bool showNotification = false;
+    private string notificationMessage = string.Empty;
+    private System.Threading.Timer? notificationTimer;
+    private string currentAgent = "ChackGPT"; // Track which agent is currently speaking
+    private HubConnection? hubConnection;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Logger.LogInformation("💬 DrewNotificationBalloon initializing...");
+        
+        // Subscribe to chat message notifications
+        ChatMessageService.ChatMessageReceived += OnChatMessageReceived;
+        // Subscribe to popup visibility changes to close balloon when slide opens/closes
+        ChatMessageService.PopupVisibilityChanged += OnPopupVisibilityChanged;
+        // Subscribe to next slide requests to close balloon when next slide is clicked
+        ChatMessageService.NextSlideRequested += OnNextSlideRequested;
+        
+        // Connect to SignalR hub to receive agent change events
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl(Navigation.ToAbsoluteUri("/chathub"))
+            .WithAutomaticReconnect()
+            .Build();
+
+        // Listen for agent changes via SignalR
+        hubConnection.On<string>("AgentChanged", (agentName) =>
+        {
+            Logger.LogInformation("💬 DrewNotificationBalloon: Agent changed to {AgentName}, current was {CurrentAgent}, showNotification={ShowNotification}", agentName, currentAgent, showNotification);
+            InvokeAsync(() =>
+            {
+                currentAgent = agentName;
+                // Close this balloon when DrewGPT becomes the active agent
+                if (agentName == "DrewGPT" && showNotification)
+                {
+                    Logger.LogInformation("💬 DrewNotificationBalloon: Closing balloon because DrewGPT is now active");
+                    CloseNotification();
+                }
+                Logger.LogInformation("💬 DrewNotificationBalloon: Updated currentAgent to {CurrentAgent}, showNotification={ShowNotification}", currentAgent, showNotification);
+                StateHasChanged();
+            });
+        });
+
+        try
+        {
+            await hubConnection.StartAsync();
+            Logger.LogInformation("✅ DrewNotificationBalloon SignalR connection established");
+        }
+        catch (Exception ex)
+        {
+            Logger.LogWarning(ex, "⚠️ DrewNotificationBalloon failed to connect to SignalR hub");
+        }
+    }
+    
+    private void OnChatMessageReceived(object? sender, string token)
+    {
+        Logger.LogInformation("💬 DrewNotificationBalloon: Message received. currentAgent={CurrentAgent}, IsPopupVisible={IsPopupVisible}, showNotification={ShowNotification}", currentAgent, ChatMessageService.IsPopupVisible, showNotification);
+        // Only accept messages when DrewGPT is the current agent AND popup is visible
+        if (currentAgent != "DrewGPT" || !ChatMessageService.IsPopupVisible) return;
+        
+        InvokeAsync(() =>
+        {
+            // Clear previous message and start fresh when receiving first token
+            // This ensures each agent's new message replaces their previous one
+            if (!showNotification)
+            {
+                // First token - start new message
+                notificationMessage = token;
+                showNotification = true;
+                StartNotificationTimer();
+            }
+            else
+            {
+                // Continuing same message - append token
+                notificationMessage += token;
+                // Reset the timer
+                StartNotificationTimer();
+            }
+            StateHasChanged();
+        });
+    }
+    
+    private void OnPopupVisibilityChanged(object? sender, bool isVisible)
+    {
+        Logger.LogInformation("💬 DrewNotificationBalloon: Popup visibility changed to {IsVisible}, currentAgent={CurrentAgent}, showNotification={ShowNotification}", isVisible, currentAgent, showNotification);
+        InvokeAsync(() =>
+        {
+            if (isVisible)
+            {
+                // Popup is opening - reset message to start fresh for new content
+                // This prevents accumulation of pre-slide and post-slide text
+                Logger.LogInformation("💬 DrewNotificationBalloon: Clearing notification due to popup opening");
+                notificationMessage = string.Empty;
+                showNotification = false;
+            }
+            else
+            {
+                // Popup is closing - only close the notification if it's currently showing for DrewGPT
+                if (showNotification && currentAgent == "DrewGPT")
+                {
+                    Logger.LogInformation("💬 DrewNotificationBalloon: Closing notification due to popup closing");
+                    CloseNotification();
+                }
+            }
+            StateHasChanged();
+        });
+    }
+    
+    private void OnNextSlideRequested(object? sender, EventArgs e)
+    {
+        InvokeAsync(() =>
+        {
+            // Close the notification balloon when next slide is requested
+            CloseNotification();
+            StateHasChanged();
+        });
+    }
+    
+    private void StartNotificationTimer()
+    {
+        notificationTimer?.Dispose();
+        notificationTimer = new System.Threading.Timer(_ =>
+        {
+            InvokeAsync(() =>
+            {
+                CloseNotification();
+                StateHasChanged();
+            });
+        }, null, TimeSpan.FromSeconds(10), Timeout.InfiniteTimeSpan);
+    }
+    
+    private void CloseNotification()
+    {
+        Logger.LogInformation("💬 DrewNotificationBalloon: CloseNotification called. currentAgent={CurrentAgent}", currentAgent);
+        showNotification = false;
+        notificationMessage = string.Empty;
+        notificationTimer?.Dispose();
+        notificationTimer = null;
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        ChatMessageService.ChatMessageReceived -= OnChatMessageReceived;
+        ChatMessageService.PopupVisibilityChanged -= OnPopupVisibilityChanged;
+        ChatMessageService.NextSlideRequested -= OnNextSlideRequested;
+        notificationTimer?.Dispose();
+        
+        if (hubConnection is not null)
+        {
+            Logger.LogInformation("💬 DrewNotificationBalloon disposing SignalR connection");
+            await hubConnection.DisposeAsync();
+        }
+    }
+}

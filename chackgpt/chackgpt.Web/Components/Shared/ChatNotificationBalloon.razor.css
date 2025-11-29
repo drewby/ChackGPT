@@ -1,0 +1,142 @@
+.chat-notification-balloon {
+    position: fixed;
+    left: 260px;
+    bottom: 20px;
+    background: white;
+    color: #2B2D42;
+    padding: 20px 24px;
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+    max-width: 600px;
+    z-index: 99999;
+    cursor: pointer;
+    animation: slideInFromLeft 0.3s ease-out;
+    border: 2px solid #667eea;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.chat-notification-avatar {
+    width: 60px;
+    height: 60px;
+    flex-shrink: 0;
+}
+
+.chat-notification-content {
+    font-size: 1rem; /* Base size for English */
+    line-height: 1.6;
+    word-wrap: break-word;
+    flex: 1;
+}
+
+/* Markdown styling for notification balloon */
+.chat-notification-content ::deep p {
+    margin: 0.5em 0;
+    font-size: 1rem !important; /* English line - smaller (default) */
+    line-height: 1.6;
+}
+
+/* First paragraph (English) - smaller */
+.chat-notification-content ::deep p:nth-of-type(1),
+.chat-notification-content ::deep p:nth-of-type(3),
+.chat-notification-content ::deep p:nth-of-type(5) {
+    font-size: 1rem !important; /* English lines */
+}
+
+/* Second, fourth, sixth paragraphs (Japanese) - much larger */
+.chat-notification-content ::deep p:nth-of-type(2),
+.chat-notification-content ::deep p:nth-of-type(4),
+.chat-notification-content ::deep p:nth-of-type(6) {
+    font-size: 2.5rem !important; /* Japanese line - much larger */
+    font-weight: 500;
+}
+
+.chat-notification-content :deep(p:first-child) {
+    margin-top: 0;
+}
+
+.chat-notification-content :deep(p:last-child) {
+    margin-bottom: 0;
+}
+
+.chat-notification-content :deep(strong),
+.chat-notification-content :deep(b) {
+    font-weight: 700;
+    color: #667eea;
+}
+
+.chat-notification-content :deep(em),
+.chat-notification-content :deep(i) {
+    font-style: italic;
+}
+
+.chat-notification-content :deep(code) {
+    background-color: #f5f5f5;
+    padding: 0.2em 0.4em;
+    border-radius: 3px;
+    font-size: 0.9em;
+    font-family: 'Consolas', 'Monaco', monospace;
+    color: #e83e8c;
+}
+
+.chat-notification-content :deep(ul),
+.chat-notification-content :deep(ol) {
+    margin: 0.5em 0;
+    padding-left: 1.5em;
+}
+
+.chat-notification-content :deep(li) {
+    margin: 0.3em 0;
+}
+
+.chat-notification-content :deep(a) {
+    color: #667eea;
+    text-decoration: underline;
+}
+
+.chat-notification-content :deep(a:hover) {
+    color: #4c5fc7;
+}
+
+.chat-notification-content :deep(h1),
+.chat-notification-content :deep(h2),
+.chat-notification-content :deep(h3) {
+    margin: 0.5em 0;
+    font-weight: 700;
+    color: #2B2D42;
+}
+
+.chat-notification-content :deep(h1) {
+    font-size: 1.4em;
+}
+
+.chat-notification-content :deep(h2) {
+    font-size: 1.2em;
+}
+
+.chat-notification-content :deep(h3) {
+    font-size: 1.1em;
+}
+
+.chat-notification-tail {
+    position: absolute;
+    left: -10px;
+    bottom: 30px;
+    width: 0;
+    height: 0;
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+    border-right: 10px solid white;
+}
+
+@keyframes slideInFromLeft {
+    from {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}

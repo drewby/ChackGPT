@@ -1,0 +1,16 @@
+.chack-avatar {
+    margin-top: auto;
+    text-align: center;
+    width: 100%;
+    position: relative;
+}
+
+.chack-image {
+    width: 100%;
+    object-fit: contain;
+    transition: transform 0.3s ease;
+}
+
+.chack-image:hover {
+    transform: scale(1.05);
+}

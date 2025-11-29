@@ -1,0 +1,314 @@
+{
+  "decks": [
+    {
+      "topic": "dotnet10",
+      "slides": [
+        {
+          "title": ".NET 10 の発表",
+          "description": "",
+          "bullets": [
+            "C# 14 による、より高速でエレガント、かつ拡張性の高いコード",
+            "アプリの起動を高速化し、スムーズに動作させ、容易にスケールさせるための改善による業界をリードするパフォーマンス",
+            "強化された SDK とライブラリにより、より安全で将来性のあるアプリを自信を持って構築可能",
+            "現在および将来のワークロード向けに設計された、Web、クラウド、モバイル、クロスプラットフォーム開発のための最新機能",
+            "Long-Term Support (LTS) リリース"
+          ],
+          "currentSlideNumber": 1,
+          "totalSlides": 4,
+          "topic": "dotnet10",
+          "language": "jp",
+          "layout": "hero-with-image",
+          "badge": "RELEASED",
+          "imagePath": "/images/presentations/dotnet10/hero-robot.png",
+          "imageAlt": ".NET 10 ロボットマスコット",
+          "url": "get.dot.net/10"
+        },
+        {
+          "title": "Visual Studio 2026",
+          "description": "",
+          "bullets": [
+            ".NET 10 および C++ 向けに最適化され、毎月の機能更新により継続的に成長",
+            "ソリューションの読み込みが最大 50% 高速化され、大規模なコードベースでもビルド、編集、デバッグのサイクルが短縮され、瞬時に起動",
+            "Fluent UI を採用したモダンなデザインにより、軽量でナビゲーションが容易になり、ツールではなくコードに集中可能",
+            "プロファイリング、テスト、モダナイゼーションのための新しい GitHub Copilot 機能により、AI が開発をサポート"
+          ],
+          "currentSlideNumber": 2,
+          "totalSlides": 4,
+          "topic": "dotnet10",
+          "language": "jp",
+          "layout": "hero-with-image",
+          "badge": "RELEASED",
+          "imagePath": "/images/presentations/dotnet10/vs2026-screenshot.png",
+          "imageAlt": "Visual Studio 2026 IDE スクリーンショット",
+          "url": "visualstudio.com/download"
+        },
+        {
+          "title": ".NET 10",
+          "description": "セキュア、高速、将来への対応",
+          "sections": [
+            {
+              "icon": "rocket",
+              "title": "Runtime",
+              "content": "パフォーマンスの向上、Just-In-Time (JIT) コンパイラの最適化、Garbage Collector (GC) の改善、最先端の Intel シリコン向け AVX10.2 拡張命令サポート"
+            },
+            {
+              "icon": "sdk",
+              "title": ".NET SDK",
+              "content": "発行サポートとネイティブ AOT を備えたファイルベースのアプリ実行、コンテナイメージのネイティブ作成、dotnet test での Microsoft.Testing.Platform サポート、一般的なシェル向けのタブ補完スクリプト"
+            },
+            {
+              "icon": "library",
+              "title": ".NET Libraries",
+              "content": "Microsoft.Extensions.AI の強化、MCP のファーストクラスサポート、暗号化、グローバリゼーション、数値演算、シリアル化、コレクション、診断における新しい API、新しい JSON シリアル化オプション、ネットワークの強化"
+            },
+            {
+              "icon": "security",
+              "title": "Security",
+              "content": "Post-quantum Cryptography (PQC) 向けの Windows Cryptography API: Next Generation (CNG) サポートを含む、セキュリティと暗号化の強化"
+            },
+            {
+              "icon": "web",
+              "title": "ASP.NET Core",
+              "content": "WebAuthN とパスキーによるシンプルなセキュリティ、Minimal API の検証、OpenAPI 3.1、アプリの可観測性と診断の強化、よりスマートなメモリ管理、JSON Patch 処理の改善"
+            },
+            {
+              "icon": "blazor",
+              "title": "Blazor",
+              "content": "宣言的な状態永続化、複雑なフォーム検証、QuickGrid の強化、WebAssembly 診断、合理化された JavaScript 相互運用、自動ブラウザテストによるスケーラビリティと信頼性の向上"
+            },
+            {
+              "icon": "mobile",
+              "title": ".NET MAUI",
+              "content": "編集、ビルド、ランタイムのパフォーマンス、Aspire 統合、多数のコントロール強化と品質向上、Xcode 26、Android API 35 & 36 を含む最新プラットフォームバージョンのサポート"
+            },
+            {
+              "icon": "database",
+              "title": "EF Core",
+              "content": "LINQ の強化、パフォーマンスの最適化、Azure Cosmos DB のサポート改善、名前付きクエリフィルタ"
+            }
+          ],
+          "currentSlideNumber": 3,
+          "totalSlides": 4,
+          "topic": "dotnet10",
+          "language": "jp",
+          "layout": "grid-sections"
+        },
+        {
+          "title": "C# 14",
+          "description": "より高速、拡張可能、エレガント",
+          "bullets": [
+            "Null 条件代入",
+            "`field` キーワード",
+            "拡張メンバー",
+            "単純なラムダパラメータの修飾子",
+            "`nameof` が非バインドジェネリック型をサポート",
+            "`Span<T>` および `ReadOnlySpan<T>` の暗黙的変換",
+            "部分イベントとコンストラクタ",
+            "ユーザー定義の複合代入演算子"
+          ],
+          "currentSlideNumber": 4,
+          "totalSlides": 4,
+          "topic": "dotnet10",
+          "language": "jp",
+          "layout": "hero-with-image",
+          "imagePath": "/images/presentations/csharp14/code-examples.png",
+          "imageAlt": "field キーワードやその他の機能を示す C# 14 コード例"
+        }
+      ]
+    },
+    {
+      "topic": "intelligence",
+      "slides": [
+        {
+          "title": "Microsoft Agent Framework",
+          "description": "",
+          "bullets": [
+            "AI エージェントとマルチエージェント ワークフローを構築するための統合基盤",
+            "エージェントの開発、テスト、デバッグ ワークフローのための対話型開発者 UI",
+            "相互運用性と柔軟性のためのオープン標準に基づいて構築",
+            "コミュニティ主導、オープンソース、そして拡張可能な設計"
+          ],
+          "currentSlideNumber": 1,
+          "totalSlides": 4,
+          "topic": "intelligence",
+          "language": "jp",
+          "layout": "hero-with-image",
+          "badge": "PUBLIC PREVIEW",
+          "imagePath": "/images/presentations/intelligence/agent-framework-dev-ui.png",
+          "imageAlt": "Writer、Reviewer、Editor エージェントを使用したマルチエージェント コンテンツ作成ワークフローを示す Microsoft Agent Framework 開発者 UI",
+          "url": "aka.ms/AgentFramework"
+        },
+        {
+          "title": "Model Context Protocol (MCP)",
+          "description": "MCP クライアントはツールを呼び出し、リソースを要求し、プロンプトを取得します。MCP サーバーはツール、リソース、プロンプトを公開します。例として、クライアント側には Visual Studio Code、Claude、GitHub があり、サーバー側には MCP C# SDK を使用して C# で構築されたカスタム MCP サーバーがあります。",
+          "currentSlideNumber": 2,
+          "totalSlides": 4,
+          "topic": "intelligence",
+          "language": "jp",
+          "layout": "title-and-image",
+          "imagePath": "/images/presentations/intelligence/mcp-architecture.png",
+          "imageAlt": "双方向通信を行う MCP クライアントと MCP サーバーを示す Model Context Protocol アーキテクチャ図"
+        },
+        {
+          "title": "MCP によって強化されたエージェント",
+          "description": "システム イベント、ユーザー メッセージ、エージェント メッセージからの入力を、指示とツールを備えた LLM を介してエージェントが処理し、エージェント メッセージとツール結果を出力する様子を示すアーキテクチャ図。エージェントは、MCP C# SDK で構築されたカスタム MCP サーバーに接続します。",
+          "currentSlideNumber": 3,
+          "totalSlides": 4,
+          "topic": "intelligence",
+          "language": "jp",
+          "layout": "title-and-image",
+          "imagePath": "/images/presentations/intelligence/agent-mcp-architecture.png",
+          "imageAlt": "LLM を介した入力処理と MCP サーバーへの接続を示すエージェント アーキテクチャ図"
+        },
+        {
+          "title": "MCP C# SDK",
+          "description": "",
+          "bullets": [
+            "現在の MCP 仕様を完全サポート",
+            "ツール、リソース、プロンプト",
+            "抽出 (Elicitation)、サンプリング",
+            "Stdio および HTTP トランスポート",
+            "Microsoft 全体で広く使用",
+            "さらなる機能が承認され、近日公開予定"
+          ],
+          "currentSlideNumber": 4,
+          "totalSlides": 4,
+          "topic": "intelligence",
+          "language": "jp",
+          "layout": "hero-with-image",
+          "badge": "PUBLIC PREVIEW",
+          "imagePath": "/images/presentations/intelligence/mcp-sdk-logo.png",
+          "imageAlt": "Model Context Protocol ロゴ",
+          "url": "aka.ms/mcp-cs-sdk"
+        }
+      ]
+    },
+    {
+      "topic": "aspire13",
+      "slides": [
+        {
+          "title": "Aspire",
+          "description": "コードファースト、拡張可能、可観測性",
+          "sections": [
+            {
+              "icon": "code",
+              "title": "Aspire AppHost + CLI",
+              "content": "スタックを **コード** で定義 — 型安全で読みやすく、**デバッグ可能**。Aspire はすべてをローカルで実行し、その後 **実際のクラウドサービス** に移行します。"
+            },
+            {
+              "icon": "integrations",
+              "title": "Aspire Integrations",
+              "content": "ローカルかリモートかを問わず、**あらゆるコードやサービス** をプラグイン。Aspire は **一般的なパターン** を提供しますが、**あらゆるもの** をモデル化できます。"
+            },
+            {
+              "icon": "dashboard",
+              "title": "Aspire Dashboard",
+              "content": "**スタック全体** の実行状況を 1 か所で確認 – すべての **ログ**、**エンドポイント**、**環境変数**、さらには完全な **OpenTelemetry** まで。"
+            }
+          ],
+          "currentSlideNumber": 1,
+          "totalSlides": 2,
+          "topic": "aspire13",
+          "language": "jp",
+          "layout": "left-content-right-image",
+          "imagePath": "/images/presentations/aspire13/architecture-diagram.png",
+          "imageAlt": "接続されたサービスを示す Aspire アーキテクチャ図"
+        },
+        {
+          "title": "Aspire 13.0",
+          "description": "",
+          "bullets": [
+            "デバッグ、コンテナ展開、自動生成 Dockerfile を備えた、.NET、JavaScript、Python にまたがる統合インフラストラクチャ",
+            "CLI の強化、単一ファイル AppHost サポート、迅速なオンボーディングによる最新の開発体験",
+            "シームレスなビルドと展開、組み込みの静的ファイルサイトサポート、堅牢な展開並列化",
+            "言語やコンテナ間での柔軟な接続文字列と証明書の信頼を備えた、エンタープライズ対応のインフラストラクチャとサービス"
+          ],
+          "currentSlideNumber": 2,
+          "totalSlides": 2,
+          "topic": "aspire13",
+          "language": "jp",
+          "layout": "hero-with-image",
+          "badge": "RELEASED",
+          "imagePath": "/images/presentations/aspire13/dashboard-screenshot.png",
+          "imageAlt": "分散トレースの詳細を示す Aspire ダッシュボード",
+          "url": "Aspire.dev"
+        }
+      ]
+    },
+    {
+      "topic": "dotnet10platform",
+      "slides": [
+        {
+          "title": "ASP.NET Core 10",
+          "description": "最新の Web アプリと API",
+          "bullets": [
+            "起動を高速化する Blazor WebAssembly プリロード",
+            "高スループットのための自動メモリプール退避",
+            "Minimal API 向けのファーストクラス OpenAPI 3.1 サポート",
+            "パスキー (FIDO2) サポートによる ID 管理の更新",
+            "セキュリティのための新しい `RedirectHttpResult.IsLocalUrl` ヘルパー"
+          ],
+          "currentSlideNumber": 1,
+          "totalSlides": 3,
+          "topic": "dotnet10platform",
+          "language": "jp",
+          "layout": "hero-with-image",
+          "imagePath": "/images/presentations/aspnet10/web-development.svg",
+          "imageAlt": "ASP.NET Core 10 Web 開発の抽象的な視覚化"
+        },
+        {
+          "title": ".NET 10 Libraries",
+          "description": "新しい API と改善点",
+          "bullets": [
+            "直接的な UTF-8 処理のための `PemEncoding` の新しい `FindUtf8` メソッド",
+            "ML-KEM、ML-DSA、SLH-DSA による Post-quantum cryptography (PQC) サポート",
+            "`DateOnly` 型の `ISOWeek` サポート",
+            "WebSocket シナリオを簡素化する `WebSocketStream`",
+            "macOS クライアントの TLS 1.3 サポート"
+          ],
+          "currentSlideNumber": 2,
+          "totalSlides": 3,
+          "topic": "dotnet10platform",
+          "language": "jp",
+          "layout": "hero-with-image",
+          "imagePath": "/images/presentations/dotnetlib10/libraries-structure.svg",
+          "imageAlt": ".NET 10 ライブラリのコード構造の視覚化"
+        },
+        {
+          "title": ".NET 10 SDK & Tooling",
+          "description": "開発者の生産性とクラウドネイティブ",
+          "bullets": [
+            "マルチ RID サポートを備えたプラットフォーム固有の .NET ツール",
+            "`dotnet tool exec` によるワンショットツール実行",
+            "bash、zsh、fish などのためのネイティブシェルタブ補完スクリプト",
+            "発行サポートとネイティブ AOT を備えたファイルベースのアプリ",
+            "Microsoft.Testing.Platform の `dotnet test` ネイティブサポート"
+          ],
+          "currentSlideNumber": 3,
+          "totalSlides": 3,
+          "topic": "dotnet10platform",
+          "language": "jp",
+          "layout": "hero-with-image",
+          "imagePath": "/images/presentations/sdktooling10/cli-interface.png",
+          "imageAlt": ".NET 10 SDK コマンドラインインターフェイスの抽象画"
+        }
+      ]
+    },
+    {
+      "topic": "summary",
+      "slides": [
+        {
+          "title": "Build intelligent apps, intelligently",
+          "description": ".NET を使用して、AI 駆動型アプリケーションとツールで開発を加速。Agentic Apps により AI エージェントをアプリに統合し、Aspire でコードからクラウドへシームレスに構築、テスト、デプロイ。Agentic DevOps により、AI エージェントを開発チームのメンバーとして活用。",
+          "currentSlideNumber": 1,
+          "totalSlides": 1,
+          "topic": "summary",
+          "language": "jp",
+          "layout": "title-and-image",
+          "imagePath": "/images/presentations/summary/intelligent-apps-ecosystem.png",
+          "imageAlt": "Agentic Apps、Aspire、Agentic DevOps による .NET インテリジェントアプリエコシステム"
+        }
+      ]
+    }
+  ]
+}
