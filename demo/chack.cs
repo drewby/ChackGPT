@@ -1,61 +1,31 @@
-#!/usr/bin/env -S dotnet run
-#:property TargetFramework=net10.0
-#:property LangVersion=preview
-#:package Spectre.Console@0.49.1
-
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
-using Spectre.Console;
-
-Evangelist? oldGuard = null;
-var ai = Evangelist.Replacement;
-
-oldGuard?.CurrentTask = "Transfer knowledge";
-ai.CurrentTask = oldGuard?.CurrentTask ?? "Lead .NET 10 Launch";
-
-Console.WriteLine($"{ai.Name}'s task: {ai.CurrentTask}");
-
-var taskAssignments = new[] { "ChackGPT", "ChackGPT", "ChackGPT", "ChackGPT", "ChackGPT" };
-
-var counts = new OrderedDictionary<string,int>(StringComparer.OrdinalIgnoreCase);
-foreach (var h in taskAssignments)
-{
-    if (!counts.TryAdd(h, 1, out int index))
-    {
-        int v = counts.GetAt(index).Value;
-        counts.SetAt(index, v + 1);
-    }
-}
-
-var table = new Table().Border(TableBorder.Heavy)
-    .AddColumn("Evangelist").AddColumn("Tasks");
-
-foreach (var kvp in counts)
-    table.AddRow(kvp.Key, kvp.Value.ToString());
-
-AnsiConsole.Write(new FigletText("ChackGPT").Color(Color.Green));
-AnsiConsole.Write(table);
 
 class Evangelist
 {
+    private string _name;
     private int _yearsExperience;
-    private string? _currentTask; 
+    private string? _currentTask;   // fixed only to avoid warning
 
     public Evangelist(string name, int yearsExperience)
     {
         if (name == null)
             throw new ArgumentNullException(nameof(name));
 
-        Name = name;
+        _name = name.Trim();
         _yearsExperience = yearsExperience;
     }
 
     public string Name
     {
-        get;
-        set => field = value?.Trim()
-            ?? throw new ArgumentNullException(nameof(value));
+        get { return _name; }
+        set
+        {
+            if (value == null)
+                throw new ArgumentNullException(nameof(value));
+
+            _name = value.Trim();
+        }
     }
 
     public int YearsExperience
@@ -71,16 +41,41 @@ class Evangelist
     }
 }
 
-static class EvangelistExtensions
+class Program
 {
-    extension(Evangelist e)
+    static void Main()
     {
-        public bool IsLegend =>
-            e.Name.Equals("Chack", StringComparison.OrdinalIgnoreCase);
-    }
-    extension(Evangelist)
-    {
-        public static Evangelist Replacement =>
-            new Evangelist("ChackGPT", 1);
+        var chack = new Evangelist("Chack ", 20);
+
+        var taskAssignments = new[]
+        {
+            "Chack", "Chack", "ChackGPT", "Chack", "ChackGPT"
+        };
+
+        var counts = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var handler in taskAssignments)
+        {
+            int current;
+            if (counts.TryGetValue(handler, out current))
+            {
+                counts[handler] = current + 1;
+            }
+            else
+            {
+                counts[handler] = 1;
+            }
+        }
+
+        Console.WriteLine("===== Evangelist Task Summary =====");
+        Console.WriteLine();
+
+        Console.WriteLine("Evangelist        Tasks");
+        Console.WriteLine("------------------------");
+
+        foreach (var kvp in counts)
+        {
+            Console.WriteLine($"{kvp.Key,-16} {kvp.Value}");
+        }
     }
 }
